@@ -1,0 +1,288 @@
+\documentclass[12pt]{article}
+ 
+ %%% Packages %%%
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,graphicx,mathtools,tikz,hyperref}
+\usepackage[mathscr]{euscript}
+\usepackage{multicol}
+\usepackage{wrapfig}
+\usetikzlibrary{positioning}
+\usepackage{tikz-cd}
+\usepackage{tikz}
+\usepackage{upgreek}
+\usepackage[mathscr]{euscript}
+\usepackage{ mathrsfs }
+\usepackage{MnSymbol} % smallsmile
+
+%%%%% Tikz-cd commutative diagrams %%%%%%%
+
+%%%%%%Tikzpictures %%%%%%%%%%%%%%%%%
+\usetikzlibrary{decorations.markings}
+
+%%%% Extra stuff$$$$
+\def\eps{\epsilon}
+\def\veps{\varepsilon}
+\def\iff{\Longleftrightarrow}
+\def\sm{\setminus}
+\def\weakto{\rightharpoonup}
+
+
+%%% Letters and Stuff %%%
+\newcommand{\infC}{C^{\infty}}
+\newcommand{\0}{\{0\}}
+\newcommand{\closeB}{\overline{\mathbb{B}}}
+\newcommand{\n}{\mathbb{N}}
+\newcommand{\p}{\mathbb{P}}
+\newcommand{\z}{\mathbb{Z}}
+\newcommand{\q}{\mathbb{Q}}
+\newcommand{\K}{\text{Ker}}
+\newcommand{\cx}{\mathbb{C}}
+\newcommand{\real}{\mathbb{R}}
+\newcommand{\field}{\mathbb{F}}
+\newcommand{\fn}{\rightarrow}
+\newcommand{\ita}[1]{\textit{#1}}
+\newcommand{\com}[2]{#1\backslash#2}
+\newcommand{\oneton}{\{1,2,3,...,n\}}
+\newcommand\idea[1]{\begin{gather*}#1\end{gather*}}
+\newcommand\ef{\ita{f} }
+\newcommand\eff{\ita{f}}
+\newcommand\proofs[1]{\begin{proof}#1\end{proof}}
+\newcommand\inv[1]{#1^{-1}}
+\newcommand\setb[1]{\{#1\}}
+\newcommand\en{\ita{n }}
+\newcommand{\vbrack}[1]{\langle #1\rangle}
+
+\newcommand{\rdisc}{\left(\real, d_{\text{disc}}\right)}
+\newcommand{\reuc}{\left(\real, d_{\text{euc}}\right)}
+\newcommand{\B}{\mathscr{B}}
+\newcommand{\T}{\mathscr{T}}
+\newcommand{\Os}{\mathscr{O}}
+\newcommand{\U}{\mathscr{U}}
+\newcommand{\ap}{_{\approx}}
+\newcommand{\cl}{\text{Cl}}
+
+\renewcommand{\qedsymbol}{\includegraphics[scale=.03]{bobafett.jpg}}
+
+%%% Environment Stuff %%%
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+
+\newenvironment{exer}[2][Exercise]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace 
+\labelsep
+ {\bfseries :}
+]}{\end{trivlist}}
+
+\newenvironment{exers}[2][Exercises]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace 
+\labelsep
+ {\bfseries :}
+]}{\end{trivlist}}
+
+\newenvironment{reflection}[2][Reflection]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+
+\newenvironment{proposition}[2][Proposition]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+ \hypersetup{
+ colorlinks,
+ linkcolor=blue
+ }
+ \newenvironment{Def}[2][Definition]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+ 
+
+ 
+ \newenvironment{notation}[2][Notation]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace 
+\labelsep {\bfseries :}
+]}{\end{trivlist}}
+
+ \newenvironment{fact}[2][Fact]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace 
+\labelsep {\bfseries :} 
+]  }{\end{trivlist}}
+
+\newtheorem*{claim*}{Claim}
+\newtheorem*{remark}{Remark}
+
+% Operators%%
+
+\DeclareMathOperator{\Char}{char}
+\DeclareMathOperator{\height}{height}
+\DeclareMathOperator{\image}{Im}
+\DeclareMathOperator{\Tau}{\mathscr{T}}
+\DeclareMathOperator{\Int}{Int}
+\DeclareMathOperator{\Id}{Id}
+\DeclareMathOperator{\Ob}{Ob}
+\DeclareMathOperator{\Hom}{Hom}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\Ab}{Ab}
+\DeclareMathOperator{\Aut}{Aut}
+\DeclareMathOperator{\arccot}{arccot}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\Gal}{Gal}
+\DeclareMathOperator{\Lie}{Lie}
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\F}{F}
+\DeclareMathOperator{\grad}{grad}
+\DeclareMathOperator{\Div}{div}
+
+
+%matrix stuff
+\def\diag{\operatorname {diag}}
+\def\GL{\operatorname {GL}}
+\def\SL{\operatorname {SL}}
+\def\PSL{\operatorname {PSL}}
+\def\PGL{\operatorname {PGL}}
+\def\Rad{\operatorname {Rad}}
+\def\SO{\operatorname {SO}}
+\def\SU{\operatorname {SU}}
+\def\O{\operatorname{O}} %Orthogonal
+\def\G{\operatorname{G}} %Grassmannian
+\def\Ad{\operatorname{Ad}}
+\def\ad{\operatorname{ad}}
+\def\Tr{\operatorname {Tr}}
+\def\tr{\operatorname{tr}}
+\def\U{\operatorname {U}}
+\def\det{\operatorname{det}}
+\def\sgn{\operatorname{sgn}}
+\def\I{\operatorname{I}}
+
+%%Lie algebras%%
+\def\gl{\operatorname {\frakg\frakl}}
+\def\sl{\operatorname {\fraks\frakl}}
+\def\Der{\operatorname{Der}}
+\def\Inner{\operatorname{Inner}}
+
+%%Symbols%%
+\def\mbb{\mathbb}
+\def\AA{{\mathbb A}}
+\def\BB{{\mathbb B}}
+\def\CC{{\mathbb C}} 
+\def\FF{{\mathbb F}}
+\def\HH{{\mathbb H}}
+\def\KK{{\mathbb K}}
+\def\MM{{\mathbb M}}
+\def\NN{{\mathbb N}}
+\def\OO{{\mathbb O}}
+\def\PP{{\mathbb P}}
+\def\QQ{{\mathbb Q}}
+\def\RR{{\mathbb R}}
+\def\SS{{\mathbb S}}
+\def\TT{{\mathbb T}}
+\def\UU{{\mathbb U}}
+\def\ZZ{{\mathbb Z}}
+\def\CCP{\mathbb{CP}}
+\def\RRP{\mathbb{RP}}
+\def\ii{{\mathbbm i}}
+\def\jj{{\mathbbm j}}
+\def\kk{{\mathbbm k}}
+\def\1{{\mathbbm 1}}
+
+
+%%italic%%
+\def\cal{\mathcal}
+\def\cA{{\cal A}}
+\def\cB{{\cal B}}
+\def\cC{{\cal C}}
+\def\cD{{\cal D}}
+\def\cE{{\cal E}}
+\def\cF{{\cal F}}
+\def\cG{{\cal G}}
+\def\cH{{\cal H}}
+\def\cI{{\cal I}}
+\def\cJ{{\cal J}}
+\def\cK{{\cal K}}
+\def\cL{{\cal L}}
+\def\cM{{\cal M}}
+\def\cN{{\cal N}}
+\def\cO{{\cal O}}
+\def\cP{{\cal P}}
+\def\cQ{{\cal Q}}
+\def\cR{{\cal R}}
+\def\cS{{\cal S}}
+\def\cT{{\cal T}}
+\def\cU{{\cal U}}
+\def\cV{{\cal V}}
+\def\cW{{\cal W}}
+\def\cX{{\cal X}}
+\def\cY{{\cal Y}}
+\def\cZ{{\cal Z}}
+
+%Gothic/Frak%
+\def\fraka{{\mathfrak{a}}}
+\def\frakb{{\mathfrak{b}}}
+\def\frakc{{\mathfrak{c}}}
+\def\frakd{{\mathfrak{d}}}
+\def\frake{{\mathfrak{e}}}
+\def\frakf{{\mathfrak{f}}}
+\def\frakg{{\mathfrak{g}}}
+\def\frakh{{\mathfrak{h}}}
+\def\fraki{{\mathfrak{i}}}
+\def\frakj{{\mathfrak{j}}}
+\def\frakk{{\mathfrak{k}}}
+\def\frakl{{\mathfrak{l}}}
+\def\frakm{{\mathfrak{m}}}
+\def\frakn{{\mathfrak{n}}}
+\def\frako{{\mathfrak{o}}}
+\def\frakp{{\mathfrak{p}}}
+\def\frakq{{\mathfrak{q}}}
+\def\frakr{{\mathfrak{r}}}
+\def\fraks{{\mathfrak{s}}}
+\def\frakt{{\mathfrak{t}}}
+\def\fraku{{\mathfrak{u}}}
+\def\frakv{{\mathfrak{v}}}
+\def\frakw{{\mathfrak{w}}}
+\def\frakx{{\mathfrak{x}}}
+\def\fraky{{\mathfrak{y}}}
+\def\frakz{{\mathfrak{z}}}
+
+\def\frakX{{\mathfrak{X}}}
+
+%fancy italic, \mathscr{}%
+\def\scrL{{\mathscr{L}}}
+
+
+%Smiles on top of letters
+\def\hg{{\mathord{\stackrel{\smallsmile}{g}}}}
+
+\begin{document}
+	\begin{proposition}\\
+	The Convex hull of a set $S$ in the plane is defined to be the intersection of all convex sets that contains $S$.  For the convex hull of a set of points it was indicated that the convex hull is the convex set with smallest perimeter.  We want to show that these are equivalent definitions.
+	\\
+	(a) Prove that the intersection of two convex sets is agian convex.  
+	\\
+	(b) Prove that the smallests perimeter polygon $\mathcal{P}$ containing a set of points $P$ is convex.
+	\\
+	(c) Prove that any convex set containing the set of points $P$ contains the smallest perimeter polygon $\mathcal{P}$.
+	\end{proposition}
+	\begin{proof}
+		(a) is easy
+		\\
+		(b), suppose $\mathcal{P}$ is the smallests preiter polygon containing a set of poitns $P$.  Suppose for a contradiction it is not convex, then there rae two vertices $p,q$ such that the line from $p$ to $q$ is not in $\mathbb{P}$.  But that means we can find a point on that line and add it to the polygon to get a even smaller perimeter, since the line is always shorter distance then the additino of the two sides from the triangle by the triangle inequality.
+		\\
+		(c) Let $C$ be any convex set containing the points $P$.  Let $\mathcal{P}$ be the smallests perimeter polygon that conains $P$.  We can take the intersection of $C$ with $\mathcal{P}$ and take the collectin of vertices of $\mathcal{P}$ contained in $C$ and the intersection points(there are a finite number of them since we are intersecting it with a polygon) and make a polygon that all of the points $P$ (since both sets did).  By minimality we must have $\mathcal{P}$ is contained in $C$.
+	\end{proof}
+	\indent Problem 1.2
+	\begin{proposition}\\
+		problem 1.2 in book
+		
+	\end{proposition}
+	\begin{proof}
+	Let $P$ be a set of points.  Let $\mathcal{P}$ be a convex polygon that with vertices from $P$ and contains all points of $P$.  Let $\widetilde{\mathcal{P}}$ be the smallest premeter polygon that contains $P$.  Therefore we have
+		\begin{align*}
+		\mathcal{P}\subseteq \widetilde{\mathcal{P}}.
+		\end{align*}
+		Now since $\widetilde{\mathcal{P}}$ is the smallest priemeter polygon that contains $P$ which is also convex.  Then it must contain $\mathcal{P}$ as well since it is convex and all of its vertices are in $P$. Hence they are the same.  THen it is clear that it is the intersection of all convex sets that contain $P$ since
+		\begin{align*}
+			\mathcal{P}\subseteq \cap C_{\alpha} \subseteq \widetilde{\mathcal{P}}.
+		\end{align*}
+	\end{proof}
+\end{document}

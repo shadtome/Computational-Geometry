@@ -1,0 +1,291 @@
+\documentclass[12pt]{article}
+ 
+ %%% Packages %%%
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,graphicx,mathtools,tikz,hyperref}
+\usepackage[mathscr]{euscript}
+\usepackage{multicol}
+\usepackage{wrapfig}
+\usetikzlibrary{positioning}
+\usepackage{tikz-cd}
+\usepackage{tikz}
+\usepackage{upgreek}
+\usepackage[mathscr]{euscript}
+\usepackage{ mathrsfs }
+\usepackage{MnSymbol} % smallsmile
+
+%%%%% Tikz-cd commutative diagrams %%%%%%%
+
+%%%%%%Tikzpictures %%%%%%%%%%%%%%%%%
+\usetikzlibrary{decorations.markings}
+
+%%%% Extra stuff$$$$
+\def\eps{\epsilon}
+\def\veps{\varepsilon}
+\def\iff{\Longleftrightarrow}
+\def\sm{\setminus}
+\def\weakto{\rightharpoonup}
+
+
+%%% Letters and Stuff %%%
+\newcommand{\infC}{C^{\infty}}
+\newcommand{\0}{\{0\}}
+\newcommand{\closeB}{\overline{\mathbb{B}}}
+\newcommand{\n}{\mathbb{N}}
+\newcommand{\p}{\mathbb{P}}
+\newcommand{\z}{\mathbb{Z}}
+\newcommand{\q}{\mathbb{Q}}
+\newcommand{\K}{\text{Ker}}
+\newcommand{\cx}{\mathbb{C}}
+\newcommand{\real}{\mathbb{R}}
+\newcommand{\field}{\mathbb{F}}
+\newcommand{\fn}{\rightarrow}
+\newcommand{\ita}[1]{\textit{#1}}
+\newcommand{\com}[2]{#1\backslash#2}
+\newcommand{\oneton}{\{1,2,3,...,n\}}
+\newcommand\idea[1]{\begin{gather*}#1\end{gather*}}
+\newcommand\ef{\ita{f} }
+\newcommand\eff{\ita{f}}
+\newcommand\proofs[1]{\begin{proof}#1\end{proof}}
+\newcommand\inv[1]{#1^{-1}}
+\newcommand\setb[1]{\{#1\}}
+\newcommand\en{\ita{n }}
+\newcommand{\vbrack}[1]{\langle #1\rangle}
+
+\newcommand{\rdisc}{\left(\real, d_{\text{disc}}\right)}
+\newcommand{\reuc}{\left(\real, d_{\text{euc}}\right)}
+\newcommand{\B}{\mathscr{B}}
+\newcommand{\T}{\mathscr{T}}
+\newcommand{\Os}{\mathscr{O}}
+\newcommand{\U}{\mathscr{U}}
+\newcommand{\ap}{_{\approx}}
+\newcommand{\cl}{\text{Cl}}
+
+\renewcommand{\qedsymbol}{\includegraphics[scale=.03]{bobafett.jpg}}
+
+%%% Environment Stuff %%%
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+
+\newenvironment{exer}[2][Exercise]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace 
+\labelsep
+ {\bfseries :}
+]}{\end{trivlist}}
+
+\newenvironment{exers}[2][Exercises]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace 
+\labelsep
+ {\bfseries :}
+]}{\end{trivlist}}
+
+\newenvironment{reflection}[2][Reflection]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+
+\newenvironment{proposition}[2][Proposition]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+ \hypersetup{
+ colorlinks,
+ linkcolor=blue
+ }
+ \newenvironment{Def}[2][Definition]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+ 
+
+ 
+ \newenvironment{notation}[2][Notation]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace 
+\labelsep {\bfseries :}
+]}{\end{trivlist}}
+
+ \newenvironment{fact}[2][Fact]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace 
+\labelsep {\bfseries :} 
+]  }{\end{trivlist}}
+
+\newtheorem*{claim*}{Claim}
+\newtheorem*{remark}{Remark}
+
+% Operators%%
+
+\DeclareMathOperator{\Char}{char}
+\DeclareMathOperator{\height}{height}
+\DeclareMathOperator{\image}{Im}
+\DeclareMathOperator{\Tau}{\mathscr{T}}
+\DeclareMathOperator{\Int}{Int}
+\DeclareMathOperator{\Id}{Id}
+\DeclareMathOperator{\Ob}{Ob}
+\DeclareMathOperator{\Hom}{Hom}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\Ab}{Ab}
+\DeclareMathOperator{\Aut}{Aut}
+\DeclareMathOperator{\arccot}{arccot}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\Gal}{Gal}
+\DeclareMathOperator{\Lie}{Lie}
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\F}{F}
+\DeclareMathOperator{\grad}{grad}
+\DeclareMathOperator{\Div}{div}
+
+
+%matrix stuff
+\def\diag{\operatorname {diag}}
+\def\GL{\operatorname {GL}}
+\def\SL{\operatorname {SL}}
+\def\PSL{\operatorname {PSL}}
+\def\PGL{\operatorname {PGL}}
+\def\Rad{\operatorname {Rad}}
+\def\SO{\operatorname {SO}}
+\def\SU{\operatorname {SU}}
+\def\O{\operatorname{O}} %Orthogonal
+\def\G{\operatorname{G}} %Grassmannian
+\def\Ad{\operatorname{Ad}}
+\def\ad{\operatorname{ad}}
+\def\Tr{\operatorname {Tr}}
+\def\tr{\operatorname{tr}}
+\def\U{\operatorname {U}}
+\def\det{\operatorname{det}}
+\def\sgn{\operatorname{sgn}}
+\def\I{\operatorname{I}}
+
+%%Lie algebras%%
+\def\gl{\operatorname {\frakg\frakl}}
+\def\sl{\operatorname {\fraks\frakl}}
+\def\Der{\operatorname{Der}}
+\def\Inner{\operatorname{Inner}}
+
+%%Symbols%%
+\def\mbb{\mathbb}
+\def\AA{{\mathbb A}}
+\def\BB{{\mathbb B}}
+\def\CC{{\mathbb C}} 
+\def\FF{{\mathbb F}}
+\def\HH{{\mathbb H}}
+\def\KK{{\mathbb K}}
+\def\MM{{\mathbb M}}
+\def\NN{{\mathbb N}}
+\def\OO{{\mathbb O}}
+\def\PP{{\mathbb P}}
+\def\QQ{{\mathbb Q}}
+\def\RR{{\mathbb R}}
+\def\SS{{\mathbb S}}
+\def\TT{{\mathbb T}}
+\def\UU{{\mathbb U}}
+\def\ZZ{{\mathbb Z}}
+\def\CCP{\mathbb{CP}}
+\def\RRP{\mathbb{RP}}
+\def\ii{{\mathbbm i}}
+\def\jj{{\mathbbm j}}
+\def\kk{{\mathbbm k}}
+\def\1{{\mathbbm 1}}
+
+
+%%italic%%
+\def\cal{\mathcal}
+\def\cA{{\cal A}}
+\def\cB{{\cal B}}
+\def\cC{{\cal C}}
+\def\cD{{\cal D}}
+\def\cE{{\cal E}}
+\def\cF{{\cal F}}
+\def\cG{{\cal G}}
+\def\cH{{\cal H}}
+\def\cI{{\cal I}}
+\def\cJ{{\cal J}}
+\def\cK{{\cal K}}
+\def\cL{{\cal L}}
+\def\cM{{\cal M}}
+\def\cN{{\cal N}}
+\def\cO{{\cal O}}
+\def\cP{{\cal P}}
+\def\cQ{{\cal Q}}
+\def\cR{{\cal R}}
+\def\cS{{\cal S}}
+\def\cT{{\cal T}}
+\def\cU{{\cal U}}
+\def\cV{{\cal V}}
+\def\cW{{\cal W}}
+\def\cX{{\cal X}}
+\def\cY{{\cal Y}}
+\def\cZ{{\cal Z}}
+
+%Gothic/Frak%
+\def\fraka{{\mathfrak{a}}}
+\def\frakb{{\mathfrak{b}}}
+\def\frakc{{\mathfrak{c}}}
+\def\frakd{{\mathfrak{d}}}
+\def\frake{{\mathfrak{e}}}
+\def\frakf{{\mathfrak{f}}}
+\def\frakg{{\mathfrak{g}}}
+\def\frakh{{\mathfrak{h}}}
+\def\fraki{{\mathfrak{i}}}
+\def\frakj{{\mathfrak{j}}}
+\def\frakk{{\mathfrak{k}}}
+\def\frakl{{\mathfrak{l}}}
+\def\frakm{{\mathfrak{m}}}
+\def\frakn{{\mathfrak{n}}}
+\def\frako{{\mathfrak{o}}}
+\def\frakp{{\mathfrak{p}}}
+\def\frakq{{\mathfrak{q}}}
+\def\frakr{{\mathfrak{r}}}
+\def\fraks{{\mathfrak{s}}}
+\def\frakt{{\mathfrak{t}}}
+\def\fraku{{\mathfrak{u}}}
+\def\frakv{{\mathfrak{v}}}
+\def\frakw{{\mathfrak{w}}}
+\def\frakx{{\mathfrak{x}}}
+\def\fraky{{\mathfrak{y}}}
+\def\frakz{{\mathfrak{z}}}
+
+\def\frakX{{\mathfrak{X}}}
+
+%fancy italic, \mathscr{}%
+\def\scrL{{\mathscr{L}}}
+
+
+%Smiles on top of letters
+\def\hg{{\mathord{\stackrel{\smallsmile}{g}}}}
+
+
+\begin{document}
+	\begin{proposition}\\
+		Let $E$ be an unsorted set of $n$ segments that are the edges of a convex polygon.  Describe an $O(n \log n)$ algorithm that computes from $E$ a list containing all vertices of the polygon, sorted in clockwise order.
+	\end{proposition}
+	\begin{proof}
+	Let $E=\{e_1,\dots, e_n\}$ defined as $e_i=p_iq_i$ where $p_i$ and $q_i$ are the end points of the line segments and $p_i<q_i$ using lexographic ordering.  Now define a ordering on the elements of $E$ by $e_i<e_j$ if and only if $p_i(x)<p_j(x)$ or $p_i(x)=p_j(x)$ and $q_i(y)<q_j(y)$. 
+	\\
+	\\
+	\indent Algorithm Vertices of polygon of edges
+	Input: $E$
+	Output: a ordered list of vertices of the polygon of $E$ is clockwise order
+	\\
+	1. Order $E$ by the relation above so that $E=\{S_1,\dots, S_n\}$.
+	\\
+	2. Let $\mathcal{L}_U$ be a set and let $p_1,q_1$ from $S_1$ be put in to it.
+	\\
+	3. keep $=q_1$
+	\\
+	4. For $i=1$ to $n$
+	\\
+	5.\indent if $p_i=$keep, then add $q_i$ in to $\mathcal{L}_U$
+	\\
+	6.\indent\indent keep=$q_i$.
+	\\
+	7. let $\mathcal{L}_L$ be the lower vertices and put keep in to it from the last loop
+	\\
+	8. for $i=n$ to $1$
+	\\
+	9.\indent if $q_i$=keep
+	\\
+	10.\indent \indent then add $p_i$ to $\mathcal{L}_L$, keep=$p_i$.
+	\\
+	11.Delete the last and first points in $\mathcal{L}_L$ and we can take the order list as $\mathcal{L}_U\cup \mathcal{L}_L$.
+	\end{proof}
+\end{document}
