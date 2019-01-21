@@ -140,18 +140,29 @@ Side Side_of_line(std::vector<float> P,std::vector<float> Q,std::vector<float> R
 
 
 
-
+//-------------------------------------------------------------------
+//Polygon Class
 
 class Polygon
 {
 public:
   //Vertices of the polygon // just use this for now, I can make it better later if I need this, just to make it easy to test
   Points Vertices; // vertices of a polygon in clockwise order
-
+  //Default Constructor
+  Polygon();
   //Constructor: finds the polygonal convex hull that contains the points
   Polygon(Points &points);
 
+
+
+
+
 };
+
+Polygon::Polygon()
+{
+  this->Vertices={{0,0}};
+}
 
 Polygon::Polygon(Points &points)
 {
@@ -232,13 +243,66 @@ Polygon::Polygon(Points &points)
   {
     Vertices.push_back(List_Lower[k]);
   }
-
-
 }
 
 
+//------------------------------------------------------------------------------
+// Now lets find the convex hull for the union of two convex polygons
 
+Polygon Convex_Union(Polygon &poly1, Polygon &poly2)
+{
+  Points* Vertices[2]={ &poly1.Vertices, &poly2.Vertices};
+  // Make enough room for all the vertices
+  std::vector<float> ConvUnion[poly1.Vertices.size()+poly2.Vertices.size()]; // the resulting list of vertices that will make the convex polygon
+  ConvUnion[0]=poly1.Vertices[0];
+  ConvUnion[1]=poly1.Vertices[1];
 
+  int index[2]={2,0}; //current vertex for polygon 2
+
+  int flip =1;  // which polygon to choose a vertex from opposite from the last one we put in to the List
+
+  int j=1;  // Which index of the list ConvUnion we are putting the next vertex in to.
+
+  while(index[0] < poly1.Vertices.size() || index[1] < poly2.Vertices.size())
+  {
+    bool did_delete=false;                        // tell if we deleted vertices, which means, don't flip
+    j += 1;
+    ConvUnion[j]= (*Vertices[flip])[index[flip]]; // plug in the vertex for poly in to the jth spot
+    index[flip] += 1;                             // increment the index for this polygon
+
+    if(j>1)
+    {
+      while(Side_of_line(ConvUnion[j-2],ConvUnion[j-1],ConvUnion[j])==LEFT ) // Check if the three points are turn left, which is what we dont want
+      {
+        did_delete=true;              // if deleted, we wont swich the flip, but continue on
+        ConvUnion[j-1]=ConvUnion[j]; // delate the middle point out of these three
+        j -=1;                       // go back on which vertex we want to put in, since we deleted one
+
+        if(j<=1)
+          break;                    // if we go back to 2 elements, break out of this loop
+      }
+      if(did_delete==false)
+      {
+        flip = (flip+1) %2;                           // change the flip so we can check the other polygon
+      }
+      if(index[0]==poly1.Vertices.size())   //if we finished this polygon, just stay on the other polygon till the end
+      {
+        flip = 1;
+      }
+      if(index[1] == poly2.Vertices.size())
+      {
+        flip =0;
+      }
+    }
+  }
+  Polygon result;
+  result.Vertices[0]=ConvUnion[0];
+  for (int k=1; k<j+1; ++k)
+  {
+    result.Vertices.push_back(ConvUnion[k]);
+  }
+  return result;
+}
 
 
 
@@ -247,18 +311,25 @@ Polygon::Polygon(Points &points)
 
 int main()
 {
-  Points Vertices = {{4,3},{1,2}, {2,3}, {3,1},{2,5}};
+  Points Vertices1 = {{1,2},{2,5},{4,3},{3,1}};
+  Points Vertices2 = {{4,5},{6,8},{7,1}};
 
-  Polygon test(Vertices);
+  Polygon test1(Vertices1);
+  Polygon test2(Vertices2);
 
-  for(int k=0; k<test.Vertices.size(); ++k)
+  Polygon union_test=Convex_Union(test1, test2);
+
+  /*for(int k=0; k<test1.Vertices.size(); ++k)
   {
-    for(int j=0; j<2; ++j)
-    {
-      std::cout << test.Vertices[k][j];
-    }
-    std::cout << "::" << std::endl;
-
+    std::cout << test1.Vertices[k][0] << "::" << test1.Vertices[k][1] << std::endl;
+  }
+  for(int k=0; k<test2.Vertices.size(); ++k)
+  {
+    std::cout << test2.Vertices[k][0] << "::" << test2.Vertices[k][1] << std::endl;
+  }*/
+  for(int k=0; k<union_test.Vertices.size(); ++k)
+  {
+    std::cout << union_test.Vertices[k][0] << "::" << union_test.Vertices[k][1] << std::endl;
   }
 
 

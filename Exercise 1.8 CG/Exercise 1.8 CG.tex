@@ -1,0 +1,287 @@
+\documentclass[12pt]{article}
+ 
+ %%% Packages %%%
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,graphicx,mathtools,tikz,hyperref}
+\usepackage[mathscr]{euscript}
+\usepackage{multicol}
+\usepackage{wrapfig}
+\usetikzlibrary{positioning}
+\usepackage{tikz-cd}
+\usepackage{tikz}
+\usepackage{upgreek}
+\usepackage[mathscr]{euscript}
+\usepackage{ mathrsfs }
+\usepackage{MnSymbol} % smallsmile
+
+%%%%% Tikz-cd commutative diagrams %%%%%%%
+
+%%%%%%Tikzpictures %%%%%%%%%%%%%%%%%
+\usetikzlibrary{decorations.markings}
+
+%%%% Extra stuff$$$$
+\def\eps{\epsilon}
+\def\veps{\varepsilon}
+\def\iff{\Longleftrightarrow}
+\def\sm{\setminus}
+\def\weakto{\rightharpoonup}
+
+
+%%% Letters and Stuff %%%
+\newcommand{\infC}{C^{\infty}}
+\newcommand{\0}{\{0\}}
+\newcommand{\closeB}{\overline{\mathbb{B}}}
+\newcommand{\n}{\mathbb{N}}
+\newcommand{\p}{\mathbb{P}}
+\newcommand{\z}{\mathbb{Z}}
+\newcommand{\q}{\mathbb{Q}}
+\newcommand{\K}{\text{Ker}}
+\newcommand{\cx}{\mathbb{C}}
+\newcommand{\real}{\mathbb{R}}
+\newcommand{\field}{\mathbb{F}}
+\newcommand{\fn}{\rightarrow}
+\newcommand{\ita}[1]{\textit{#1}}
+\newcommand{\com}[2]{#1\backslash#2}
+\newcommand{\oneton}{\{1,2,3,...,n\}}
+\newcommand\idea[1]{\begin{gather*}#1\end{gather*}}
+\newcommand\ef{\ita{f} }
+\newcommand\eff{\ita{f}}
+\newcommand\proofs[1]{\begin{proof}#1\end{proof}}
+\newcommand\inv[1]{#1^{-1}}
+\newcommand\setb[1]{\{#1\}}
+\newcommand\en{\ita{n }}
+\newcommand{\vbrack}[1]{\langle #1\rangle}
+
+\newcommand{\rdisc}{\left(\real, d_{\text{disc}}\right)}
+\newcommand{\reuc}{\left(\real, d_{\text{euc}}\right)}
+\newcommand{\B}{\mathscr{B}}
+\newcommand{\T}{\mathscr{T}}
+\newcommand{\Os}{\mathscr{O}}
+\newcommand{\U}{\mathscr{U}}
+\newcommand{\ap}{_{\approx}}
+\newcommand{\cl}{\text{Cl}}
+
+\renewcommand{\qedsymbol}{\includegraphics[scale=.03]{bobafett.jpg}}
+
+%%% Environment Stuff %%%
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+
+\newenvironment{exer}[2][Exercise]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace 
+\labelsep
+ {\bfseries :}
+]}{\end{trivlist}}
+
+\newenvironment{exers}[2][Exercises]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace 
+\labelsep
+ {\bfseries :}
+]}{\end{trivlist}}
+
+\newenvironment{reflection}[2][Reflection]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+
+\newenvironment{proposition}[2][Proposition]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+ \hypersetup{
+ colorlinks,
+ linkcolor=blue
+ }
+ \newenvironment{Def}[2][Definition]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace \labelsep {\bfseries #2:}]}{\end{trivlist}}
+ 
+
+ 
+ \newenvironment{notation}[2][Notation]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace 
+\labelsep {\bfseries :}
+]}{\end{trivlist}}
+
+ \newenvironment{fact}[2][Fact]{\begin{trivlist}
+\item[\hspace \labelsep {\bfseries #1}\hspace 
+\labelsep {\bfseries :} 
+]  }{\end{trivlist}}
+
+\newtheorem*{claim*}{Claim}
+\newtheorem*{remark}{Remark}
+
+% Operators%%
+
+\DeclareMathOperator{\Char}{char}
+\DeclareMathOperator{\height}{height}
+\DeclareMathOperator{\image}{Im}
+\DeclareMathOperator{\Tau}{\mathscr{T}}
+\DeclareMathOperator{\Int}{Int}
+\DeclareMathOperator{\Id}{Id}
+\DeclareMathOperator{\Ob}{Ob}
+\DeclareMathOperator{\Hom}{Hom}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\Ab}{Ab}
+\DeclareMathOperator{\Aut}{Aut}
+\DeclareMathOperator{\arccot}{arccot}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\Gal}{Gal}
+\DeclareMathOperator{\Lie}{Lie}
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\F}{F}
+\DeclareMathOperator{\grad}{grad}
+\DeclareMathOperator{\Div}{div}
+
+
+%matrix stuff
+\def\diag{\operatorname {diag}}
+\def\GL{\operatorname {GL}}
+\def\SL{\operatorname {SL}}
+\def\PSL{\operatorname {PSL}}
+\def\PGL{\operatorname {PGL}}
+\def\Rad{\operatorname {Rad}}
+\def\SO{\operatorname {SO}}
+\def\SU{\operatorname {SU}}
+\def\O{\operatorname{O}} %Orthogonal
+\def\G{\operatorname{G}} %Grassmannian
+\def\Ad{\operatorname{Ad}}
+\def\ad{\operatorname{ad}}
+\def\Tr{\operatorname {Tr}}
+\def\tr{\operatorname{tr}}
+\def\U{\operatorname {U}}
+\def\det{\operatorname{det}}
+\def\sgn{\operatorname{sgn}}
+\def\I{\operatorname{I}}
+
+%%Lie algebras%%
+\def\gl{\operatorname {\frakg\frakl}}
+\def\sl{\operatorname {\fraks\frakl}}
+\def\Der{\operatorname{Der}}
+\def\Inner{\operatorname{Inner}}
+
+%%Symbols%%
+\def\mbb{\mathbb}
+\def\AA{{\mathbb A}}
+\def\BB{{\mathbb B}}
+\def\CC{{\mathbb C}} 
+\def\FF{{\mathbb F}}
+\def\HH{{\mathbb H}}
+\def\KK{{\mathbb K}}
+\def\MM{{\mathbb M}}
+\def\NN{{\mathbb N}}
+\def\OO{{\mathbb O}}
+\def\PP{{\mathbb P}}
+\def\QQ{{\mathbb Q}}
+\def\RR{{\mathbb R}}
+\def\SS{{\mathbb S}}
+\def\TT{{\mathbb T}}
+\def\UU{{\mathbb U}}
+\def\ZZ{{\mathbb Z}}
+\def\CCP{\mathbb{CP}}
+\def\RRP{\mathbb{RP}}
+\def\ii{{\mathbbm i}}
+\def\jj{{\mathbbm j}}
+\def\kk{{\mathbbm k}}
+\def\1{{\mathbbm 1}}
+
+
+%%italic%%
+\def\cal{\mathcal}
+\def\cA{{\cal A}}
+\def\cB{{\cal B}}
+\def\cC{{\cal C}}
+\def\cD{{\cal D}}
+\def\cE{{\cal E}}
+\def\cF{{\cal F}}
+\def\cG{{\cal G}}
+\def\cH{{\cal H}}
+\def\cI{{\cal I}}
+\def\cJ{{\cal J}}
+\def\cK{{\cal K}}
+\def\cL{{\cal L}}
+\def\cM{{\cal M}}
+\def\cN{{\cal N}}
+\def\cO{{\cal O}}
+\def\cP{{\cal P}}
+\def\cQ{{\cal Q}}
+\def\cR{{\cal R}}
+\def\cS{{\cal S}}
+\def\cT{{\cal T}}
+\def\cU{{\cal U}}
+\def\cV{{\cal V}}
+\def\cW{{\cal W}}
+\def\cX{{\cal X}}
+\def\cY{{\cal Y}}
+\def\cZ{{\cal Z}}
+
+%Gothic/Frak%
+\def\fraka{{\mathfrak{a}}}
+\def\frakb{{\mathfrak{b}}}
+\def\frakc{{\mathfrak{c}}}
+\def\frakd{{\mathfrak{d}}}
+\def\frake{{\mathfrak{e}}}
+\def\frakf{{\mathfrak{f}}}
+\def\frakg{{\mathfrak{g}}}
+\def\frakh{{\mathfrak{h}}}
+\def\fraki{{\mathfrak{i}}}
+\def\frakj{{\mathfrak{j}}}
+\def\frakk{{\mathfrak{k}}}
+\def\frakl{{\mathfrak{l}}}
+\def\frakm{{\mathfrak{m}}}
+\def\frakn{{\mathfrak{n}}}
+\def\frako{{\mathfrak{o}}}
+\def\frakp{{\mathfrak{p}}}
+\def\frakq{{\mathfrak{q}}}
+\def\frakr{{\mathfrak{r}}}
+\def\fraks{{\mathfrak{s}}}
+\def\frakt{{\mathfrak{t}}}
+\def\fraku{{\mathfrak{u}}}
+\def\frakv{{\mathfrak{v}}}
+\def\frakw{{\mathfrak{w}}}
+\def\frakx{{\mathfrak{x}}}
+\def\fraky{{\mathfrak{y}}}
+\def\frakz{{\mathfrak{z}}}
+
+\def\frakX{{\mathfrak{X}}}
+
+%fancy italic, \mathscr{}%
+\def\scrL{{\mathscr{L}}}
+
+
+%Smiles on top of letters
+\def\hg{{\mathord{\stackrel{\smallsmile}{g}}}}
+
+\begin{document}
+problem 1.8
+	\begin{proposition}\\
+		We shall develop an algorithm based on another paradigm, namely divide-and-conquer.
+		\\
+		(a) Let $\mathcal{P}_1$ and $\mathcal{P}_2$ be two disjoint convex polygons with $n$ vertices in total.  Give an $\O(n)$ time algorthm that computes  the convex hull of $\mathcal{P}_1\cup \mathcal{P}_2$.
+		\\
+		(b) Us ethe algorithm from part (a) to develop an $\O(n \log n)$ time divide-and-conquer algorithm to compute the convex hull of a set of $n$ points in the plane.
+	\end{proposition}
+	\begin{proof}
+	\indent (a) Let $\mathcal{P}_1=\{x_1,\dots, x_k\}$ and $\mathcal{P}_2=\{x_{k+1},\dots, x_{n}\}$.
+	Algorithm:
+	\begin{enumerate}
+	\item find the vertex in $\mathcal{P}_1$ that is the smallest in terms of lexo, and do the same for $\mathcal{P}_2$ this is O(n) since we need to go through it once
+	\item List=$\{x_1,x_2\}$ set the fist two points as $x_1,x_2$
+	\item set $index_1=3$, $index_2=1$.  These are the current vertices we are at for each convex polygon
+	\item $j=3$;  this is the current place where we need to fill in
+	\item flip index $i=2$; this is the ability to flip between which polygon we are testing, since we need to flip between them, otherwise we would just complete one of the convex polygons right in the beginning with out getting anywhere
+	\item ~~~~while($index_1\neq$ last index for $\mathcal{P}_1$ and $index_2\neq$ last index for $\mathcal{P}_2$)
+	\item ~~~~~~~~ add $x_{index_i}$ in to $list$ at the $j$th spot
+	\item ~~~~~~~~ $index_i++$.
+	\item ~~~~~~~~ if(check if $list[j-2],list[j-1], list[j]$ turn left)
+	\item ~~~~~~~~~~~~ delete $list[j-1]$ and $index_j--$ that corresponded to this vertex that we deleted, which is $i+1 mod 2$
+	\item ~~~~~~~~~~~~ $j--$
+	\item ~~~~~~~~else 
+	\item ~~~~~~~~~~~$ j++$
+	\item ~~~~~~~~~~~ flip $i=i+1$ $mod 2$.
+	\item the list that we have will have all the vertices to the new convex polygon in clockwise order.
+	
+	\end{enumerate}
+	\end{proof}
+\end{document}
