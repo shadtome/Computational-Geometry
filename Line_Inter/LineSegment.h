@@ -5,6 +5,11 @@
 #include "Point.h"
 
 
+/*
+*Contains the endpoints of the LineSegment, and does relational operations based on the lexographical ordering with respect to
+* (x,y)< (z,w) iff y>w or y=w and x<z.
+*/
+
 class Line_Segment
 {
 public:

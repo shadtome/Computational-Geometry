@@ -1,6 +1,13 @@
 #ifndef POINT_H
 #define POINT_H
 
+/*
+*Contains the x and y coordinates of the point in R^2
+*Also, has relational operators based on the lexographical ordering (x,y)< (z,w) iff y>w or y=b and x<z
+*/
+
+
+
 class Point2
 {
 public:
