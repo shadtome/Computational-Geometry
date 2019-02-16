@@ -64,7 +64,7 @@ bool Line_Segment::operator==(const Line_Segment &line)const
 
 
 //Class Compare Methods
-bool LineSegCompare::operator()( const Line_Segment &line1, const Line_Segment &line2)const
+constexpr bool std::less<Line_Segment>::operator()( const Line_Segment &line1, const Line_Segment &line2)const
 {
   return line1<line2;
 }

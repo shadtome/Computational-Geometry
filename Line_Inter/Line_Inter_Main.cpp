@@ -5,15 +5,23 @@
 
 
 
-
 int main()
 {
-  Line_Segment line_1({1.0,1.0},{0.0,0.0});
-  Line_Segment line_2({2.0,2.0},{0.0,0.0});
-  Line_Segment line_3({3.0,3.0},{0.0,0.0});
-  Line_Segment line_4({4.0,4.0},{0.0, 0.0});
-  Line_Segment line_5({5.0,5.0},{0.0,0.0});
-  Line_Segment line_6({6.0,6.0},{0.0,0.0});
+  BST<int,int> Test;
+
+  Test.Insert(1,1);
+  Test.Insert(2,2);
+  Test.Insert(3,3);
+  Test.Insert(4,4);
+  Test.Insert(5,5);
+  Test.Insert(6,6);
+  Test.Insert(7,7);
+  Test.Insert(8,8);
+
+
+
+
+
 
   return 0;
 }
