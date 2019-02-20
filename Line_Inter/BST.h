@@ -97,7 +97,6 @@ public:
   * walks through the tree on both sides of the node to check if it is balanced,
   *  checks the heights of the left subtree and the right subtree
   * to determine if it satisfies the balanced tree property for the subtree starting at the node
-  * O(nlogn)
   */
   bool Is_Balanced(BST_Node<T,S>* node);
 
