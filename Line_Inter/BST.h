@@ -3,6 +3,7 @@
 
 #include "LineSegment.h"
 #include <map>
+#include <cstdlib>
 
 /*
 Binary Search tree Templated Class
@@ -32,6 +33,8 @@ public:
 
   //constructor
   BST():Root_Node(NULL){};
+  //Destructor
+  ~BST();
 
   //Methods for the (Non-Balancing) BST
   //----------------------
@@ -51,40 +54,91 @@ public:
   /*
   * Node is where the search starts
   * Then check left and right subtrees starting from this node
+  * for the element with pivot S and searchs in that pivot for the element
   */
   BST_Node<T,S>* Search(BST_Node<T,S> *node,S pivot, T element);
-  void Search_Compare_Point(BST_Node<T,S> *node,S pivot, T element);      //go through the tree till we can find the spot where the new node will be put into
 
+private:
+  /*Search compare point function
+  * Takes in a node, which is where we start the search
+  * pivot and element which we will insert in to the tree
+  * This function does more then search,
+  * it searches, then compares which side, and then adds in the new element in to the list
+  * and makes sure all pointers are correct
+  * this function is recursive
+  */
+  void Search_Compare_Point(BST_Node<T,S> *node,S pivot, T element);
+
+public:
   //Balancing Methods
   //----------------------
 
+  /*Balanced function
+  * Used to take the subtree and rebalance at a specific node so that it satisfies the balanced property for that subtree
+  * This is a recursive function
+  */
+  void Balance(BST_Node<T,S>* node);
+
+  /* Balanced Delete
+  * deletes a element, and rebalances the subtree
+  * checks to see if the whole tree is still balanced after the delete
+  * if it is not balanced, then it uses the balancing function on the whole tree to balance it
+  */
+  void Balanced_Delete(S pivot, T element);
+
+  /* Balanced insert
+  * Insert a element in to the correct spot
+  * checks if the whole tree is balanced, if not, use the balancing function on the whole tree
+  */
+  void Balanced_Insert(S pivot, T new_element);
+
+
+  /* Is Balanced function
+  * walks through the tree on both sides of the node to check if it is balanced,
+  *  checks the heights of the left subtree and the right subtree
+  * to determine if it satisfies the balanced tree property for the subtree starting at the node
+  * O(nlogn)
+  */
+  bool Is_Balanced(BST_Node<T,S>* node);
+
+private:
   /* Node_list function
   * Takes a subtree and concatenates the ordered list from the left tree and right tree with the "root node" in the middle of them
   */
   std::vector<BST_Node<T,S>*> Node_list(BST_Node<T,S>* node);
 
-  /*Balanced function
-  * Used to take the subtree and rebalance at a specific node so that it satisfies the balanced property for that subtree
+  /* Balance_Node
+  * Takes in a list of nodes that are ordered
+  * the root_node is the middle node in the ordered list of nodes
+  * middle index corresponds to the middle index of the middle node
+  * this is a recursive function
   */
-  void Balance(BST_Node<T,S>* node);
+  void Balance_Node(std::vector<BST_Node<T,S>*> &nodes, BST_Node<T,S>* root_node,int &middle_index);
 
-  /* Balanced Delete
-  * deletes a element, and rebalances the subtree so that the whole tree is still balanced
+  /* Depth Function
+  * determines the largest depth as it walks down the Tree from this node
+  * this is recursive as it goes through both left and right
+  * and finds the max.
   */
-  void Balanced_Delete(S pivot, T element);
-
-  /* Balanced insert
-  * Insert a element in the correct spot, but balances the subtree so that the whole tree is balanced
-  */
-  void Balanced_Insert(S pivot, T new_element);
-
-private:
-  /* Self Balancing function given the list of Nodes
-  * That will balance just these Nodes
-  */
-  void Balance_Node(std::vector<BST_Node<T,S>*> &nodes, BST_Node<T,S>* root_node);
+  int Depth(BST_Node<T,S>* node);
 
 };
+
+//Deconstructor
+template<class T,class S>
+BST<T,S>::~BST()
+{
+
+  std::vector<BST_Node<T,S>*> list=Node_list(this->Root_Node);
+  for(unsigned int k=0; k<list.size(); ++k)
+  {
+    delete list[k];
+  }
+  if(this->Root_Node->data[5]==5)
+  {
+    std::cout << "who"<<std::endl;
+  }
+}
 
 //Methods
 template<class T, class S>
@@ -109,6 +163,10 @@ void BST<T,S>::Delete(S pivot,T element)
 {
   BST_Node<T,S>* to_be_deleted;
   to_be_deleted=Search(Root_Node,pivot,element);        //Search for the node that we are going to delete
+
+
+
+
 
   //Next, we need to search in the right children tree for the smallest element with the given ordering to replace the spot we deleted
   if(to_be_deleted->Right_Node==NULL)                      //Check if the left node has anything, if not, then less operations we need to do when deleting
@@ -138,21 +196,44 @@ void BST<T,S>::Delete(S pivot,T element)
   {
     //when there is children in the right node, we need to search for the smallest node, which means we need to travel through the left turns beginning at the first right node child of to_be_deleted
     BST_Node<T,S>* iterator = to_be_deleted->Right_Node;
+    //walk through the left nodes till we stop
+    //There is a case where there is no left turns, which we handle below
     while(iterator->Left_Node != NULL)
     {
-      iterator= iterator->Left_Node;          //search through the Left_Node till we get to one that has null left node pointer
+      iterator= iterator->Left_Node;
     }
 
+    //If the right node is null, then just replace the deleted spot by this most left node
     if(iterator->Right_Node==NULL)
     {
-      to_be_deleted->data = iterator->data;     //repplace the to_be_delete data
-      delete iterator;                         //delete what it is pointing to
+      to_be_deleted->data = iterator->data;
+      delete iterator;
+
     }
-    else
+    else if(iterator!=to_be_deleted->Right_Node)           //Otherwise, we have to connected its right node stuff to the parent of the iterator spot
     {
       to_be_deleted->data = iterator->data;
       iterator->Parent_Node->Left_Node=iterator->Right_Node;           //Let the parent node of the iterator point to the right node of the iterator, so we dont lose this connection
+
       delete iterator;
+
+    }
+    else      //This is the case, where the iterator did not even move (which means the right node of the to be deleted does not have a left node)
+    {
+      //replace the to be deleted by its right node
+
+
+      iterator->Left_Node=iterator->Parent_Node->Left_Node;   //Make sure we dont lose all the nodes on the left
+
+      iterator->Parent_Node=iterator->Parent_Node->Parent_Node; //connect this node to the parent of the to_be_deleted
+
+      if(iterator->Parent_Node==NULL)
+      {
+        this->Root_Node=iterator;         //this is the case when we are deleting the main root node
+      }
+
+      delete to_be_deleted;
+
     }
   }
 }
@@ -193,7 +274,8 @@ void BST<T,S>::Search_Compare_Point(BST_Node<T,S>* node,S pivot, T element)
     {
       BST_Node<T,S>* node_p= new BST_Node<T,S>;          //Make new node pointer
       node_p->data[element]=element;
-      node_p->pivot=pivot;                                 //Input the data for new node
+      node_p->pivot=pivot;
+      node_p->Parent_Node=node;                                //Input the data for new node
       node->Left_Node=node_p;
       return;
     }
@@ -207,7 +289,8 @@ void BST<T,S>::Search_Compare_Point(BST_Node<T,S>* node,S pivot, T element)
     {
       BST_Node<T,S>* node_p= new BST_Node<T,S>;          //Make new node pointer
       node_p->data[element]=element;
-      node_p->pivot=pivot;                                 //Input the data for new node
+      node_p->pivot=pivot;
+      node_p->Parent_Node=node;                               //Input the data for new node
       node->Right_Node=node_p;
       return;
     }
@@ -264,21 +347,35 @@ void BST<T,S>::Balance(BST_Node<T,S>* node)
 
   //First, find the ordered list from smallest to largest for the subtree with "root node" at node
   ordered_list=Node_list(node);
+  int middle_index = (int)ordered_list.size()/2;
 
   //If the node we put in is the root node, we need to do something more special
   //since the Root_Node element is a pointer, so we need to actually change this pointer
   //otherwise, we will lose the entire Tree
   if(node==this->Root_Node)
   {
+    //Set this parents node to NULL
+    ordered_list[middle_index]->Parent_Node=NULL;
     //look for the middle one, and set it equal to this pointer
-    int middle_index = (int)ordered_list.size()/2;
     this->Root_Node=ordered_list[middle_index];
-    Balance_Node(ordered_list,this->Root_Node);
+    Balance_Node(ordered_list,this->Root_Node,middle_index);
   }
   else
   {
+    //Set the parent of the new "rood node" to be the parent of the old "rood node"
+    ordered_list[middle_index]->Parent_Node=node->Parent_Node;
+
+    //Next, point the correct left or right node of the parent to the new "rood node"
+    if(node->Parent_Node->Left_Node==node)
+    {
+      ordered_list[middle_index]->Parent_Node->Left_Node=ordered_list[middle_index];
+    }
+    else
+    {
+      ordered_list[middle_index]->Parent_Node->Right_Node=ordered_list[middle_index];
+    }
     //Next, Balance the node
-    Balance_Node(ordered_list,node);
+    Balance_Node(ordered_list,ordered_list[middle_index],middle_index);
   }
 
 
@@ -287,10 +384,8 @@ void BST<T,S>::Balance(BST_Node<T,S>* node)
 
 
 template<class T,class S>
-void BST<T,S>::Balance_Node(std::vector<BST_Node<T,S>*> &nodes,BST_Node<T,S>* root_node)
+void BST<T,S>::Balance_Node(std::vector<BST_Node<T,S>*> &nodes,BST_Node<T,S>* root_node,int &middle_index)
 {
-  //Set our new "root node" as the middle of this list
-  int middle_index = (int)nodes.size()/2;
 
   //The "root node" for the left subtree
   int left_middle_index=(int)(middle_index)/2;
@@ -298,13 +393,12 @@ void BST<T,S>::Balance_Node(std::vector<BST_Node<T,S>*> &nodes,BST_Node<T,S>* ro
   //the "root node" for the right subtree
   int right_middle_index=(int)(nodes.size()+middle_index)/2;
 
-  //Point the middle node in this list to the "root node"
-  nodes[middle_index]->Parent_Node=root_node;
 
   if(left_middle_index != middle_index)                  //Check if there is anymore elements to the left of the middle element
   {
     //point the "root nodes" left child to middle of the left section of the list
     root_node->Left_Node=nodes[left_middle_index];
+    nodes[left_middle_index]->Parent_Node=root_node;
 
 
     std::vector<BST_Node<T,S>*> left_section_nodes;
@@ -312,7 +406,7 @@ void BST<T,S>::Balance_Node(std::vector<BST_Node<T,S>*> &nodes,BST_Node<T,S>* ro
     //insert the right section of the whole list in to this new list
     left_section_nodes.insert(it_l,nodes.begin(), nodes.begin()+middle_index);
     //Process through the same function, but now for the elements less then the middle element
-    Balance_Node(left_section_nodes,root_node->Left_Node);
+    Balance_Node(left_section_nodes,root_node->Left_Node,left_middle_index);
   }
   else
   {
@@ -324,21 +418,178 @@ void BST<T,S>::Balance_Node(std::vector<BST_Node<T,S>*> &nodes,BST_Node<T,S>* ro
   {
     //point the "root node" right child to the middle of the right section of the list
     root_node->Right_Node=nodes[right_middle_index];
+    nodes[right_middle_index]->Parent_Node=root_node;
 
     //Also, do the same for the right section
     std::vector<BST_Node<T,S>*> right_section_nodes;
     auto it_r = right_section_nodes.begin();
     //Process through the same function, but now for the elements greater then the middle element
+
+    //Now construct a new list of ordered nodes, starting from the right neighbor of the middle index node
     right_section_nodes.insert(it_r,nodes.begin()+middle_index+1, nodes.end());
-    Balance_Node(right_section_nodes,root_node->Right_Node);
+    //We need to change the location of the right middle index, since we tranlsated the right section the old nodes list by middle_index+1 to the left
+    right_middle_index=right_middle_index-middle_index-1;
+    //NOw process this new right subtree
+    Balance_Node(right_section_nodes,root_node->Right_Node,right_middle_index);
   }
   else
   {
     root_node->Right_Node=NULL;
   }
 
+
 }
 
+
+template<class T,class S>
+void BST<T,S>::Balanced_Delete(S pivot, T element)
+{
+
+  //Search for the node where this pivot and element is
+  BST_Node<T,S>* node=Search(this->Root_Node,pivot,element);
+
+  //order the list of nodes under this node
+  std::vector<BST_Node<T,S>*> list=Node_list(node);
+
+  //Next, remove the node that corresponds to the original node
+  int counter=0;
+  while(list[counter] != node)
+  {
+    counter+=1;
+  }
+
+  //Delete the node corresponding to the counter
+  std::vector<BST_Node<T,S>*> new_list;
+  new_list.reserve(list.size()-1);
+  if(counter==0)
+  {
+    auto it=new_list.begin();
+    new_list.insert(it,list.begin()+1,list.end());
+  }
+  else
+  {
+    auto it=new_list.begin();
+    new_list.insert(it,list.begin(),list.begin()+counter);
+    it=new_list.begin();
+    new_list.insert(it+counter,list.begin()+counter+1,list.end());
+  }
+
+  //FInd the middle index of this new list, which will become the new "root node"
+  int middle_index =(int)new_list.size()/2;
+
+  //connect the parent nodes between the original "root node" and the original which is going to be deleted
+  new_list[middle_index]->Parent_Node=node->Parent_Node;
+  //also, we need to make sure the parent nodes correctly points to the new "root node"
+  if(node->Parent_Node!=NULL)
+  {
+    if(node->Parent_Node->Left_Node==node)
+    {
+      new_list[middle_index]->Parent_Node->Left_Node=new_list[middle_index];
+    }
+    else
+    {
+      new_list[middle_index]->Parent_Node->Right_Node=new_list[middle_index];
+    }
+  }
+  else
+  {
+    //This implies it is the root node of the entire tree, hence, we need to make sure the rootnode of BST points to the correct spt
+    this->Root_Node=new_list[middle_index];
+  }
+  //Now, we can delete the original node, since we have passed on all of the important pointers we needed
+  delete node;
+  //now, we can balance the subtree with new "root node"
+  Balance_Node(new_list,new_list[middle_index],middle_index);
+
+  if(Is_Balanced(this->Root_Node)==false)
+    Balance(this->Root_Node);
+
+}
+
+template<class T,class S>
+void BST<T,S>::Balanced_Insert(S pivot, T element)
+{
+  Insert(pivot,element);
+  if(Is_Balanced(this->Root_Node)==false)
+    Balance(this->Root_Node);
+
+}
+
+template<class T,class S>
+int BST<T,S>::Depth(BST_Node<T,S>* node)
+{
+  int max_depth=0;
+  int left_depth=0;
+  int right_depth=0;
+
+  if(node!= NULL)
+  {
+    if(node->Left_Node != NULL)             //find the depth of the left node
+    {
+      left_depth=Depth(node->Left_Node);
+    }
+    if(node->Right_Node != NULL)            //find the depth for the right node
+    {
+      right_depth=Depth(node->Right_Node);
+    }
+
+    if(left_depth>=right_depth)         //Determine which one is bigger and add one to it to get the max_depth;
+    {
+      max_depth=left_depth+1;
+    }
+    else
+    {
+      max_depth=right_depth+1;
+    }
+    return max_depth;
+
+  }
+  else
+  {
+    return 0;
+  }
+
+}
+
+template<class T,class S>
+bool BST<T,S>::Is_Balanced(BST_Node<T,S>* node)
+{
+  bool left_tree=true;
+  bool right_tree=true;
+
+  if(node!=NULL)
+  {
+    //Check both subtrees, so see if those are balanced
+    if(node->Left_Node!=NULL)
+    {
+      left_tree=Is_Balanced(node->Left_Node);
+    }
+    if(node->Right_Node!=NULL)
+    {
+      right_tree=Is_Balanced(node->Right_Node);
+    }
+
+
+    if((right_tree==false) || (left_tree==false))
+    {
+      return false;
+    }
+    else if(std::abs(Depth(node->Left_Node)-Depth(node->Right_Node))>=2)
+    {
+      return false;
+    }
+    else
+    {
+      return true;
+    }
+  }
+  else
+  {
+    return true;
+  }
+
+
+}
 
 
 #endif
