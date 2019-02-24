@@ -1,6 +1,7 @@
 #ifndef LINESEGMENT_H
 #define LINESEGMENT_H
 
+#include <map>
 #include <vector>
 #include "Point.h"
 
@@ -17,16 +18,23 @@ public:
 
   //Constructor
   Line_Segment(Point2 point_1, Point2 point_2);
-  Line_Segment(){};                                     //Default constructor
+  Line_Segment(){};
+                                    //Default constructor
   //Methods for this class
+  //Relation operators
   bool operator<( const Line_Segment &line)const ;       //Overload the relational operators
   bool operator>( const Line_Segment &line)const ;
   bool operator==(const Line_Segment &line)const ;
 
+  //Test Intersection
+  /*Intersection function
+  * Takes in another line segment and checks the projections on to the
+  * x-axis and y-axis and see if those intersect , by look at relations of the endpoints
+  */
+  bool Intersection(const Line_Segment &other);
+
 
 };
-
-
 
 
 template<>

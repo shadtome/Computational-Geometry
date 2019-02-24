@@ -5,7 +5,7 @@
 
 Line_Segment::Line_Segment(Point2 point_1, Point2 point_2)
 {
-  if (point_1<point_2)                          //Make sure to reorder the line segment, so the first endpoint is the most left up endpoint
+  if (point_1>point_2)                          //Make sure to reorder the line segment, so the first endpoint is the most left up endpoint
   {
     this->End_Points.push_back(point_1);
     this->End_Points.push_back(point_2);

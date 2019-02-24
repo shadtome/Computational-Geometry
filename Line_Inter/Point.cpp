@@ -1,4 +1,7 @@
+
 #include "Point.h"
+#include <iostream>
+#include <stdexcept>
 
 
 float Point2::operator[](int i)
@@ -7,9 +10,13 @@ float Point2::operator[](int i)
   {
     return x;
   }
-  else
+  else if(i==1)
   {
     return y;
+  }
+  else
+  {
+    throw std::runtime_error("Point2::index out of range");
   }
 
 }
@@ -106,4 +113,12 @@ bool Point2::operator==(const Point2 point)const
     return true;
   }
   return false;
+}
+
+
+
+//Class Compare Methods
+constexpr bool std::less<Point2>::operator()( const Point2 &point1, const Point2 &point2)const
+{
+  return point1<point2;
 }
