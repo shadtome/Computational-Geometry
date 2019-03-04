@@ -36,7 +36,10 @@ template<>
 struct std::less <Point2>   //compare class for input in to the std::map
 {
 public:
-  constexpr bool operator()( const Point2 &point1,const Point2 &point2)const;
+  constexpr bool operator()( const Point2 &point1,const Point2 &point2)const
+  {
+    return point1<point2;
+  }
 };
 
 #endif

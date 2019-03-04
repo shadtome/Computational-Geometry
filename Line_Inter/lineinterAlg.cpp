@@ -1,4 +1,6 @@
-#include "linetinterAlg.h"
+
+#include "lineinterAlg.h"
+#include <iostream>
 
 
 
@@ -7,7 +9,7 @@
 std::map<Point2,Intersection_Point> Find_Intersection(std::vector<Line_Segment> lines)
 {
   //Initilize the map that will contain the points and the line_segments
-  std::map<Point2,Line_Segment> result;
+  std::map<Point2,Intersection_Point> result;
 
   /* First, define the event queue
   * This holds the points in order as the pivot points
@@ -49,12 +51,13 @@ std::map<Point2,Intersection_Point> Find_Intersection(std::vector<Line_Segment> 
 
     //Next, process this event point
     //This is the meat of the algo
-    int_lines=HandleEventPoint(Queue_Node* event_point);
+    int_lines=HandleEventPoint(event_point,Q,T);
 
     //Insert the line_segments in to the result map.
     for(unsigned int k=0; k<int_lines.size(); ++k)
     {
-      result[event_point->Pivot]=int_lines[k];
+      Intersection_Point intersections(event_point->pivot,int_lines);
+      result[event_point->pivot]=intersections;
     }
 
   }
@@ -70,7 +73,7 @@ std::map<Point2,Intersection_Point> Find_Intersection(std::vector<Line_Segment> 
 
 //-----------------------------------------------------
 //Handle event point function
-std::vector<Line_Segment> HandleEventPoint(Queue_Node* p,Queue Q, Status T)
+std::vector<Line_Segment> HandleEventPoint(Queue_Node* p,Queue &Q, Status &T)
 {
   //This is the collection of line_segments that contain the point p as a upper point
   std::vector<Line_Segment> U_p;

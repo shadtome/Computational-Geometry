@@ -114,11 +114,3 @@ bool Point2::operator==(const Point2 point)const
   }
   return false;
 }
-
-
-
-//Class Compare Methods
-constexpr bool std::less<Point2>::operator()( const Point2 &point1, const Point2 &point2)const
-{
-  return point1<point2;
-}

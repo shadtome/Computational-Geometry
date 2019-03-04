@@ -1,10 +1,15 @@
 #ifndef BST_H
 #define BST_H
 
-#include "LineSegment.h"
+
+#include <iostream>
 #include <map>
 #include <cstdlib>
+#include <stack>
 #include <memory> //Maybe use smart pointers, but a little bit of overhead
+#include "LineSegment.h"
+
+
 
 /* The big question I have, I am not sure if a smart pointer is useful here or not.
 * I know where all created objects are from new here, and delete them accordly in the destructors,
@@ -23,8 +28,11 @@ Binary Search tree Templated Class
 //For now I just made another overloaded function
 
 //Forward declare the BST class
+//and the iterator class
 template<class T,class S>
 class BST;
+template<class T,class S>
+class BSTIterator;
 
 //Binary Search tree for the Event Queue and the Status record
 template<class T, class S>
@@ -57,6 +65,11 @@ public:
 template <class T,class S>
 class BST
 {
+  friend BSTIterator<T,S>;     //Iterator class
+  //declare types this class uses
+  typedef BSTIterator<T,S> iterator;
+  typedef const BSTIterator<T,S> const_iterator;
+
 public:
   BST_Node<T,S>* Root_Node;       //Root node of the Tree
 
@@ -125,7 +138,7 @@ private:
   * Used to allocate new BST with the copied information
   * this is recursive
   */
-  void _Copy_init_(BST_Node<T,S>* &node, const BST<T,S>* &other);
+  void _Copy_init_(BST_Node<T,S>* &node,const BST_Node<T,S>* &other);
 
 public:
   //Balancing Methods
@@ -150,6 +163,11 @@ public:
   */
   void Balanced_Insert(S pivot, T new_element);
 
+  /* Node_list function
+  * Takes a subtree and concatenates the ordered list from the left tree and right tree with the "root node" in the middle of them
+  */
+  std::vector<BST_Node<T,S>*> Node_list(BST_Node<T,S>* &node);
+
 private:
   /* Is Balanced function
   * walks through the tree on both sides of the node to check if it is balanced,
@@ -159,10 +177,6 @@ private:
   bool Is_Balanced(BST_Node<T,S>* node);
 
 
-  /* Node_list function
-  * Takes a subtree and concatenates the ordered list from the left tree and right tree with the "root node" in the middle of them
-  */
-  std::vector<BST_Node<T,S>*> Node_list(BST_Node<T,S>* node);
 
   /* Balance_Node
   * Takes in a list of nodes that are ordered
@@ -179,14 +193,86 @@ private:
   */
   int Depth(BST_Node<T,S>* node);
 
+public:
+  //Iterator functions
+
+  //Points to beginning
+  iterator begin()
+  {
+    return BSTIterator<T,S>(this->Root_Node);
+  }
+
+  //Const iterator
+  const_iterator cbegin()const
+  {
+    const BSTIterator<T,S> temp(this->Root_Node);
+    return temp;
+  }
+
+  //points to the end
+  iterator end()const
+  {
+    return BSTIterator<T,S>(nullptr);
+  }
+
+  //points to the end
+  const_iterator cend()const
+  {
+    const BSTIterator<T,S> temp(nullptr);
+    return temp;
+  }
 };
+
+
+
+//--------------------------------------
+/*
+* This is the BST iterator class, which uses inorder traversal with stacks.
+*/
+template<class T,class S>
+class BSTIterator
+{
+  //Stack for the iterator
+  std::stack<BST_Node<T,S>*> stack;
+  //Pointer to the location of the node
+  BST_Node<T,S>* cur_node;
+public:
+  //Constructor
+  BSTIterator(BST_Node<T,S>* p);
+  //Copy Constructor
+  BSTIterator(const BSTIterator &other):cur_node(other.cur_node),stack(other.stack){};
+  //preiterate operator
+  BSTIterator& operator++();
+
+  //Post iterate operator
+  BSTIterator operator++(int)
+  {
+    BSTIterator temp(*this);
+    this->operator++();
+    return temp;
+  }
+
+  //Equality relation
+  bool operator==(const BSTIterator& other);
+  //Not equal relation
+  bool operator!=(const BSTIterator& other);
+  //dereference operator
+  BST_Node<T,S>& operator*();
+
+
+};
+
+
+//-------------------------------------------------------------------
+//End of Class decelerations
+
 
 
 //BST_Node Methods
 //----------------------------------------------------
 //Copy constructor
 template<class T,class S>
-inline BST_Node<T,S>::BST_Node(const BST_Node<T,S> &other):Left_Node(nullptr),Right_Node(nullptr),Parent_Node(nullptr)
+BST_Node<T,S>::BST_Node(const BST_Node<T,S> &other):Left_Node(nullptr),Right_Node(nullptr),Parent_Node(nullptr)
 {
   //Set the data as the same
   this->data=other.data;
@@ -195,7 +281,7 @@ inline BST_Node<T,S>::BST_Node(const BST_Node<T,S> &other):Left_Node(nullptr),Ri
 
 //Copy Assignment operator
 template<class T,class S>
-inline BST_Node<T,S>& BST_Node<T,S>::operator=(const BST_Node<T,S> &other)
+BST_Node<T,S>& BST_Node<T,S>::operator=(const BST_Node<T,S> &other)
 {
   //assign the data
   this->data=other.data;
@@ -210,8 +296,9 @@ inline BST_Node<T,S>& BST_Node<T,S>::operator=(const BST_Node<T,S> &other)
 
 //Destructor
 template<class T,class S>
-inline BST_Node<T,S>::~BST_Node()
+BST_Node<T,S>::~BST_Node()
 {
+  //Delete the contents of this node
   if(this->Left_Node!=nullptr)
   {
     delete this->Left_Node;
@@ -225,14 +312,15 @@ inline BST_Node<T,S>::~BST_Node()
   }
 }
 
-
+//-----------------------------------------------------
+//End of BST_Node functions
 
 
 //BST Methods
 //-----------------------------------------------------
 //Copy Constructor
 template<class T,class S>
-inline BST<T,S>::BST(const BST<T,S> &other)
+BST<T,S>::BST(const BST<T,S> &other)
 {
   //Initilize new memory for the root
   BST_Node<T,S>* temp_root=new BST_Node<T,S>;
@@ -247,7 +335,7 @@ inline BST<T,S>::BST(const BST<T,S> &other)
 
 //copy Assignment operator
 template<class T,class S>
-inline BST<T,S>& BST<T,S>::operator=(const BST<T,S> &other)
+BST<T,S>& BST<T,S>::operator=(const BST<T,S> &other)
 {
   this->Root_Node=other.Root_Node;
 
@@ -257,7 +345,7 @@ inline BST<T,S>& BST<T,S>::operator=(const BST<T,S> &other)
 
 //Deconstructor
 template<class T,class S>
-inline BST<T,S>::~BST()
+BST<T,S>::~BST()
 {
   /* This is recursive,
   * once we delete the root node, the destructor will be called on the pointers, and delete objects they are pointing
@@ -318,7 +406,10 @@ void BST<T,S>::Delete(S pivot,T element)
   BST_Node<T,S>* to_be_deleted;
   to_be_deleted=Search(Root_Node,pivot,element);        //Search for the node that we are going to delete
 
+  if(to_be_deleted!=nullptr)
+  {
 
+  }
 
 
 
@@ -327,7 +418,21 @@ void BST<T,S>::Delete(S pivot,T element)
   {
     if(to_be_deleted->Left_Node==nullptr)                //check to see if we need to do anything extra when we delete
     {
+      if(to_be_deleted->Parent_Node!=nullptr)           //Make sure that the parent which was pointing to this node , make it's pointer null
+      {
+        if(to_be_deleted->Parent_Node->Right_Node==to_be_deleted)
+        {
+          to_be_deleted->Parent_Node->Right_Node=nullptr;
+        }
+        else
+        {
+          to_be_deleted->Parent_Node->Left_Node=nullptr;
+        }
+      }
+      to_be_deleted->Left_Node=nullptr;
+      to_be_deleted->Right_Node=nullptr;
       delete to_be_deleted;                           //delete the node and do nothing
+
       return;
     }
     else
@@ -339,6 +444,7 @@ void BST<T,S>::Delete(S pivot,T element)
         to_be_deleted->Left_Node=nullptr;     //Make sure we don't delete everything under it
         to_be_deleted->Right_Node=nullptr;    //Since the destructor will delete them recursivly
         delete to_be_deleted;
+
         return;
       }
       else
@@ -348,6 +454,7 @@ void BST<T,S>::Delete(S pivot,T element)
         to_be_deleted->Left_Node=nullptr;      //Make sure we don't delete everything under it
         to_be_deleted->Right_Node=nullptr;    //Since the destructor will delete them recursivly
         delete to_be_deleted;
+
         return;
       }
     }
@@ -364,19 +471,13 @@ void BST<T,S>::Delete(S pivot,T element)
     }
 
     //If the right node is null, then just replace the deleted spot by this most left node
-    if(iterator->Right_Node==nullptr)
+    if(iterator->Right_Node==nullptr && iterator!=to_be_deleted->Right_Node)
     {
+      //transfer the data over
       to_be_deleted->data = iterator->data;
-
-      iterator->Left_Node=nullptr;            //Make sure we do not delete everything under the node that this points to
-      iterator->Right_Node=nullptr;           //since the destructor is recursive
-      delete iterator;
-
-    }
-    else if(iterator!=to_be_deleted->Right_Node)           //Otherwise, we have to connected its right node stuff to the parent of the iterator spot
-    {
-      to_be_deleted->data = iterator->data;
-      iterator->Parent_Node->Left_Node=iterator->Right_Node;           //Let the parent node of the iterator point to the right node of the iterator, so we dont lose this connection
+      to_be_deleted->pivot=iterator->pivot;
+      //Now delete an pointers to the spot where the iterator is
+      iterator->Parent_Node->Left_Node=iterator->Right_Node;
 
       iterator->Left_Node=nullptr;            //Make sure we do not delete everything under the node that this points to
       iterator->Right_Node=nullptr;           //since the destructor is recursive
@@ -392,10 +493,21 @@ void BST<T,S>::Delete(S pivot,T element)
 
       iterator->Parent_Node=iterator->Parent_Node->Parent_Node; //connect this node to the parent of the to_be_deleted
 
+      //Make sure that the parent node points to the right node of the to_be_deleted node
+      if(iterator->Parent_Node->Right_Node==to_be_deleted)
+      {
+        iterator->Parent_Node->Right_Node=to_be_deleted->Right_Node;
+      }
+      else
+      {
+        iterator->Parent_Node->Left_Node=to_be_deleted->Right_Node;
+      }
+
       if(iterator->Parent_Node==nullptr)
       {
         this->Root_Node=iterator;         //this is the case when we are deleting the main root node
       }
+
 
       to_be_deleted->Left_Node=nullptr;      //Make sure we don't delete everything under it
       to_be_deleted->Right_Node=nullptr;    //Since the destructor will delete them recursivly
@@ -435,7 +547,7 @@ BST_Node<T,S>* BST<T,S>::Search(BST_Node<T,S>* &node, S pivot,T element)
 //---------------------------------------------
 //Is Empty Function
 template<class T,class S>
-inline bool BST<T,S>::Is_Empty()
+bool BST<T,S>::Is_Empty()
 {
   if(this->Root_Node!=nullptr)
   {
@@ -578,7 +690,7 @@ void _Copy_init_(BST_Node<T,S>* &node,const BST_Node<T,S>* &other)
 //-----------------------------------
 //Node_list function
 template<class T, class S>
-std::vector<BST_Node<T,S>*> BST<T,S>::Node_list(BST_Node<T,S>* node)
+std::vector<BST_Node<T,S>*> BST<T,S>::Node_list(BST_Node<T,S>* &node)
 {
   std::vector<BST_Node<T,S>*> result;            //Resulting list that we will send up through the tree
 
@@ -597,15 +709,16 @@ std::vector<BST_Node<T,S>*> BST<T,S>::Node_list(BST_Node<T,S>* node)
   //Insert the main node in the middle of the list
   result.push_back(node);
 
+
   if(node->Right_Node != nullptr)
   {
     std::vector<BST_Node<T,S>*> right_result;
     right_result = Node_list(node->Right_Node);
-
     //Insert the right_result information at the end of the result list
     auto it=result.end();
     result.insert(it,right_result.begin(),right_result.end());
   }
+
 
   return result;
 }
@@ -719,11 +832,12 @@ template<class T,class S>
 void BST<T,S>::Balanced_Delete(S pivot, T element)
 {
 
-  //Search for the node where this pivot and element is
+  /*//Search for the node where this pivot and element is
   BST_Node<T,S>* node=Search(this->Root_Node,pivot,element);
 
   //order the list of nodes under this node
   std::vector<BST_Node<T,S>*> list=Node_list(node);
+
 
   //Next, remove the node that corresponds to the original node
   int counter=0;
@@ -732,6 +846,7 @@ void BST<T,S>::Balanced_Delete(S pivot, T element)
     counter+=1;
   }
 
+  std::cout << counter << std::endl;
   //Delete the node corresponding to the counter
   std::vector<BST_Node<T,S>*> new_list;
   new_list.reserve(list.size()-1);
@@ -754,15 +869,21 @@ void BST<T,S>::Balanced_Delete(S pivot, T element)
   //connect the parent nodes between the original "root node" and the original which is going to be deleted
   new_list[middle_index]->Parent_Node=node->Parent_Node;
   //also, we need to make sure the parent nodes correctly points to the new "root node"
+
   if(node->Parent_Node!=nullptr)
   {
+
     if(node->Parent_Node->Left_Node==node)
     {
+
       new_list[middle_index]->Parent_Node->Left_Node=new_list[middle_index];
+
     }
     else
     {
+
       new_list[middle_index]->Parent_Node->Right_Node=new_list[middle_index];
+
     }
   }
   else
@@ -770,13 +891,19 @@ void BST<T,S>::Balanced_Delete(S pivot, T element)
     //This implies it is the root node of the entire tree, hence, we need to make sure the rootnode of BST points to the correct spt
     this->Root_Node=new_list[middle_index];
   }
+
   //Now, we can delete the original node, since we have passed on all of the important pointers we needed
   delete node;
+
   //now, we can balance the subtree with new "root node"
   Balance_Node(new_list,new_list[middle_index],middle_index);
+  */
 
+  Delete(pivot,element);
   if(Is_Balanced(this->Root_Node)==false)
+  {
     Balance(this->Root_Node);
+  }
 
 }
 
@@ -871,6 +998,116 @@ bool BST<T,S>::Is_Balanced(BST_Node<T,S>* node)
 
 
 }
+
+
+
+//------------------------------------------
+//Iterator functions
+
+
+
+
+
+
+
+
+
+//-------------------------------------------
+//End of BST functions
+
+//-------------------------------------------
+//BSTIterator functions
+
+//--------------------------------------------------
+//Constructor
+template<class T,class S>
+BSTIterator<T,S>::BSTIterator(BST_Node<T,S>* p)
+{
+  //First, we need to create the initial stack, starting at the node we inputed.
+  BST_Node<T,S>* nodes=p;
+
+  //Traverse the left  subtree, and only put the elements in the left nodes in to the stack
+  while(nodes!=nullptr)
+  {
+    this->stack.push(nodes);
+    nodes=nodes->Left_Node;
+  }
+
+  //Lets set the cur node as the top of the stack and pop it off of the stack as well
+  if(this->stack.empty()==false)
+  {
+    //Take the top of the stack and desinate it as the current node
+    this->cur_node=this->stack.top();
+    //Pop off the top of the stack, which corresponds to the current node
+    this->stack.pop();
+
+  }
+  else
+  {
+    cur_node=nullptr;
+  }
+}
+//---------------------------------------------------
+
+//---------------------------------------------------
+//preiterate operator++
+template<class T,class S>
+BSTIterator<T,S>& BSTIterator<T,S>::operator++()
+{
+  //BSTIterator(cur_node->Right_Node);
+
+  if(cur_node->Right_Node!=nullptr)
+  {
+    BST_Node<T,S>* nodes=cur_node->Right_Node;
+    while(nodes!=nullptr)
+    {
+      this->stack.push(nodes);
+      nodes=nodes->Left_Node;
+    }
+  }
+
+  if(this->stack.empty()==false)
+  {
+    this->cur_node=this->stack.top();
+    this->stack.pop();
+  }
+  else
+  {
+    this->cur_node=nullptr;
+  }
+
+
+  return *this;
+}
+
+//------------------------------------------------
+
+//------------------------------------------------
+//equality relation
+template<class T,class S>
+bool BSTIterator<T,S>::operator==(const BSTIterator<T,S>& other)
+{
+  return this->cur_node==other.cur_node;
+}
+
+//------------------------------------------------
+//not equal relation
+template<class T,class S>
+bool BSTIterator<T,S>::operator!=(const BSTIterator<T,S>& other)
+{
+  return !(*this==other);
+}
+
+//-----------------------------------------------
+//Dereference operator
+template<class T,class S>
+BST_Node<T,S>& BSTIterator<T,S>::operator*()
+{
+  return *this->cur_node;
+}
+
+//----------------------------------------------
+//End of BSTIterator functions
 
 
 #endif

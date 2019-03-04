@@ -41,7 +41,10 @@ template<>
 struct std::less <Line_Segment>   //compare class for input in to the std::map
 {
 public:
-  constexpr bool operator()( const Line_Segment &line1,const Line_Segment &line2)const;
+  constexpr bool operator()( const Line_Segment &line1,const Line_Segment &line2)const
+  {
+    return line1<line2;
+  }
 };
 
 #endif

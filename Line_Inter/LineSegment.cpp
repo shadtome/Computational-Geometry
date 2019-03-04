@@ -59,12 +59,3 @@ bool Line_Segment::operator==(const Line_Segment &line)const
 {
   return this->End_Points[0]==line.End_Points[0] && this->End_Points[1]==line.End_Points[1];
 }
-
-
-
-
-//Class Compare Methods
-constexpr bool std::less<Line_Segment>::operator()( const Line_Segment &line1, const Line_Segment &line2)const
-{
-  return line1<line2;
-}

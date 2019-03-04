@@ -23,6 +23,12 @@ struct Intersection_Point
   //vector list of all the line segments that intersect this point
   std::vector<Line_Segment> lines;
 
+  //default Constructor
+  Intersection_Point(){};
+
+  //Constructor
+  Intersection_Point(Point2 &point,std::vector<Line_Segment> lines): point(point),lines(lines){};
+
 };
 
 
@@ -36,7 +42,7 @@ struct Intersection_Point
 * This algorthim finds the line intersections by following a line sweep downward and check for intersection
 * everytime a event queue is processed.
 */
-std::map<Point2,Intersection_Point> Find_Intersection(std::vector<Line_Segment> lines)
+std::map<Point2,Intersection_Point> Find_Intersection(std::vector<Line_Segment> lines);
 
 
 /* Handles event points
@@ -45,7 +51,7 @@ std::map<Point2,Intersection_Point> Find_Intersection(std::vector<Line_Segment> 
 * this function processes through the main parts of the algorthm
 * It outputs a vector of line segments that intersect the point corresponding to the event point
 */
-std::vector<Line_Segment> HandleEventPoint(Queue_Node* p,Queue Q, Status T);
+std::vector<Line_Segment> HandleEventPoint(Queue_Node* p,Queue &Q, Status &T);
 
 
 
