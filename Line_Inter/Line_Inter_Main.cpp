@@ -1,37 +1,65 @@
 #include <iostream>
 #include "BST.h"
 #include "LineSegment.h"
+#include "lineinterAlg.h"
 
 
 
 
 int main()
 {
-  BST<int,int> Test;
-  Test.Insert(1,1);
-  Test.Insert(2,2);
-  Test.Insert(3,3);
-  Test.Insert(4,4);
-  Test.Insert(5,5);
-  Test.Insert(6,6);
-  Test.Insert(19,19);
-  Test.Insert(-4,-4);
-  Test.Balance(Test.Root_Node);
-  Test.Balanced_Delete(3,3);
-  //Test.Delete(5,5);
-  //Test.Balance(Test.Root_Node);
-  Test.Balanced_Delete(5,5);
-  for(auto key=Test.begin();key!=Test.end(); ++key )
+  std::vector<Line_Segment> lines;
+  lines.push_back(Line_Segment({0.0,0.0},{1.0,1.0}));
+  lines.push_back(Line_Segment({0.0,1.0},{1.0,0.0}));
+  lines.push_back(Line_Segment({0.0,0.5},{0.5,0.0}));
+
+
+  /*BST<Line_Segment,Line_Segment> test;
+  test.Insert(lines[0]);
+  test.Insert(lines[1]);
+  Point2 point(5.0,6.0);
+  test.Insert(Line_Segment(point,point));*/
+
+
+
+  std::map<Point2,Intersection_Point> inter=Find_Intersection(lines);
+  std::cout << inter.size()<<std::endl;
+  for(auto k=inter.begin(); k!=inter.end(); ++k)
   {
-    std::cout << (*key).pivot<<std::endl;
+    std::cout << k->first.x << "::"<<k->first.y<<std::endl;
   }
-  Test.Balanced_Insert(3,3);
-  Test.Balanced_Delete(5,5);
-  Test.Balanced_Delete(1,1);
-  for(auto key=Test.begin();key!=Test.end(); ++key )
+
+
+
+  /*BST<int,int> test;
+  test.Insert(0,0);
+  test.Insert(1,1);
+  test.Insert(2,2);
+  test.Insert(3,3);
+  test.Insert(4,4);
+  test.Insert(5,5);
+  test.Insert(6,6);
+  test.Insert(7,7);
+  test.Insert(8,8);
+  test.Insert(9,9);
+
+  //test.Balance(test.Root_Node);
+
+  for(auto k=test.begin(); k!=test.end();++k)
   {
-    std::cout << (*key).pivot<<std::endl;
+    std::cout << k->pivot<<std::endl;
   }
-  std::cout << "hmmm"<<std::endl;
+
+  test.Delete(8);
+  test.Delete(4);
+  std::cout << "DELETE 8"<<std::endl;
+  for(auto k=test.begin(); k!=test.end();++k)
+  {
+    std::cout << k->pivot<<std::endl;
+  }
+*/
+
+
+
   return 0;
 }

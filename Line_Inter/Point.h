@@ -29,6 +29,7 @@ public:
   bool operator>(const Point2 point)const;
   bool operator>=(const Point2 point)const;
   bool operator==(const Point2 point)const;
+  bool operator!=(const Point2 point)const;
 };
 
 //Compare function for std::map

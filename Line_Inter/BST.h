@@ -38,10 +38,10 @@ class BSTIterator;
 template<class T, class S>
 struct BST_Node
 {
-  friend BST<T,S>;      //Let the BST access its nodes
+  friend BST<T,S>;                 //Let the BST access its nodes
 public:
-  S pivot;                                      // pivot point of the node
-  std::map<T,T> data;                   //where we store the data for this node
+  S pivot;                         // pivot point of the node
+  std::map<T,T> data;              //where we store the data for this node
   BST_Node<T,S>* Left_Node;        // pointer to the left node
   BST_Node<T,S>* Right_Node;       //Pointer to the right node
   BST_Node<T,S>* Parent_Node;      //Pointer to the parent node
@@ -54,11 +54,6 @@ public:
   BST_Node(const BST_Node<T,S> &other);
   //Copy Assignment operator
   BST_Node<T,S>& operator=(const BST_Node<T,S> &other);
-
-
-  //Iterators
-
-
 
 };
 
@@ -98,11 +93,16 @@ public:
   void Insert(S pivot);
 
   /* (Non-Balancing) delete
-  * Deletes the node corresponding to the pivot and elements
+  * Deletes element in the node from the specified pivot.
   * by just finding the most left element in the right subtree
   * from the spot we deleted and replaces the deleted spot by this element we found
   */
   void Delete(S pivot, T element);
+
+  /* (non-Balancing) delete (overloaded)
+  * Deletes the node corresponding to this pivot element
+  */
+  void Delete(S pivot);
 
   //Search Function
   /*
@@ -111,6 +111,14 @@ public:
   * for the element with pivot S and searchs in that pivot for the element
   */
   BST_Node<T,S>* Search(BST_Node<T,S>* &node,S pivot, T element);
+
+  /* Search function
+  * Finds the node with a certain pivot
+  * Node is where the search starts
+  * Then check left and right subtrees starting from this node
+  * for the elemtn with pivot S
+  */
+  BST_Node<T,S>* Search(BST_Node<T,S>* &node,S pivot);
 
   /* Checks if the BST is empty or not
   * Just checks if the Root node is not null
@@ -232,6 +240,7 @@ public:
 template<class T,class S>
 class BSTIterator
 {
+
   //Stack for the iterator
   std::stack<BST_Node<T,S>*> stack;
   //Pointer to the location of the node
@@ -248,16 +257,18 @@ public:
   BSTIterator operator++(int)
   {
     BSTIterator temp(*this);
-    this->operator++();
+    ++(*this);
     return temp;
   }
 
   //Equality relation
-  bool operator==(const BSTIterator& other);
+  bool operator==(const BSTIterator& other)const;
   //Not equal relation
-  bool operator!=(const BSTIterator& other);
+  bool operator!=(const BSTIterator& other)const;
   //dereference operator
-  BST_Node<T,S>& operator*();
+  BST_Node<T,S>& operator*()const;
+  //Arrow operator
+  BST_Node<T,S>* operator->()const;
 
 
 };
@@ -406,115 +417,274 @@ void BST<T,S>::Delete(S pivot,T element)
   BST_Node<T,S>* to_be_deleted;
   to_be_deleted=Search(Root_Node,pivot,element);        //Search for the node that we are going to delete
 
-  if(to_be_deleted!=nullptr)
+  if(to_be_deleted != nullptr)      //If it is null skip the enire delete and output exception handling
   {
-
+    to_be_deleted->data.erase(element); //I don't want to delete the node (nodes with pivots but no data is fine)
   }
 
 
+}
 
-  //Next, we need to search in the right children tree for the smallest element with the given ordering to replace the spot we deleted
-  if(to_be_deleted->Right_Node==nullptr)                      //Check if the left node has anything, if not, then less operations we need to do when deleting
+//-----------------------------------------------------
+//Delete function for the entire Node
+template<class T,class S>
+void BST<T,S>::Delete(S pivot)
+{
+  BST_Node<T,S>* to_be_deleted;
+  to_be_deleted=Search(Root_Node,pivot);        //Search for the node that we are going to delete
+
+  if(to_be_deleted!=nullptr)
   {
-    if(to_be_deleted->Left_Node==nullptr)                //check to see if we need to do anything extra when we delete
+    if(to_be_deleted->Right_Node!=nullptr)  //Check if the right node is not null
     {
-      if(to_be_deleted->Parent_Node!=nullptr)           //Make sure that the parent which was pointing to this node , make it's pointer null
+      //we will start searching in the left nodes of the to_be_deleted->Right_Node
+      // To find the smallest node in this subtree to replace the to_be_deleted node
+
+      auto it=to_be_deleted->Right_Node;  //Starting point for searching for the smallest element in this subtree
+      while(it->Left_Node!=nullptr)
       {
+        it=it->Left_Node;   //Iterate to the next left node
+      }
+
+      //The it we got is the smallest node in this subtree.
+      //Next, replace the spot we are deleting by this node "it"
+
+      if(it!=to_be_deleted->Right_Node)
+      {
+
+        if(it->Right_Node!=nullptr)
+        {
+          //we need to connect the right node of the "it" spot with the parent of "it"
+          it->Parent_Node->Left_Node=it->Right_Node;
+          //Connect the "it"'s rights nodes parent with "it"'s parent
+          it->Right_Node->Parent_Node=it->Parent_Node;
+
+        }
+        else
+        {
+          it->Parent_Node->Left_Node=nullptr;
+        }
+
+
+
+        //move the pointers of to_be_deleted to "it".
+        it->Left_Node=to_be_deleted->Left_Node;
+        it->Right_Node=to_be_deleted->Right_Node;
+        it->Parent_Node=to_be_deleted->Parent_Node;
+
+        //Make sure the parent of to_be_deleted points to "it"
+        if(to_be_deleted->Parent_Node!=nullptr)
+        {
+          //check which side of the parent node to_be_deleted is
+          if(to_be_deleted->Parent_Node->Right_Node==to_be_deleted)
+          {
+            it->Parent_Node->Right_Node=it;
+          }
+          else
+          {
+            it->Parent_Node->Left_Node=it;
+          }
+        }
+        else
+        {
+          //This is when we are deleting the root node
+          this->Root_Node=it;
+        }
+
+
+        //Before we fully delete, we need to make sure that the left and right nodes of to_be_deleted actually point
+        // to it
+        if(to_be_deleted->Left_Node!=nullptr)
+        {
+          to_be_deleted->Left_Node->Parent_Node=it;
+        }
+        if(to_be_deleted->Right_Node!=nullptr)
+        {
+          to_be_deleted->Right_Node->Parent_Node=it;
+        }
+
+        //Next, disconnect the points on to_be_deleted and delete it
+        to_be_deleted->Right_Node=nullptr;
+        to_be_deleted->Left_Node=nullptr;
+        to_be_deleted->Parent_Node=nullptr;
+        delete to_be_deleted;
+      }
+      else
+      {
+
+
+        //This is the situation when it did not even move, so it is still to_be_deleted->Right_Node
+        it->Parent_Node=to_be_deleted->Parent_Node;
+        it->Left_Node=to_be_deleted->Left_Node;   //the left node of to_be_deleted->Right_Node=nullptr
+
+        //Make sure the left node of to_be_deleted actually points to it NOw
+        if(it->Left_Node!=nullptr)
+        {
+          it->Left_Node->Parent_Node=it;
+        }
+
+        //Connect the parents right/left node to "it"
+        if(it->Parent_Node!=nullptr)
+        {
+          if(it->Parent_Node->Right_Node==to_be_deleted)
+          {
+            it->Parent_Node->Right_Node=it;
+          }
+          else
+          {
+            it->Parent_Node->Left_Node=it;
+          }
+        }
+        else
+        { //We are deleting the root node, so hence make sure root connects to "it"
+          this->Root_Node=it;
+        }
+
+
+
+        to_be_deleted->Right_Node=nullptr;
+        to_be_deleted->Left_Node=nullptr;
+        to_be_deleted->Parent_Node=nullptr;
+        delete to_be_deleted;
+
+      }
+
+    }
+    else if(to_be_deleted->Left_Node!=nullptr)
+    {
+      //In this situation, we will look at the left node of to_be_deleted and search for the largest node
+      // in this subtree
+      auto it=to_be_deleted->Left_Node;
+      while(it->Right_Node!=nullptr)
+      {
+        it=it->Right_Node;        //Iterate to the next right node.
+      }
+
+      //Now that we have the biggest node in this subtree, we can replace the
+      // to_be_deleted node with the it node and make sure we connect the correct pointers
+
+      if(it!=to_be_deleted->Right_Node)
+      {
+        //if the left node of it is not nullptr, we need to make sure to connect it with "it"'s parent
+        if(it->Left_Node!=nullptr)
+        {
+          it->Left_Node->Parent_Node=it->Parent_Node;
+          it->Parent_Node->Right_Node=it->Left_Node;
+        }
+        else
+        {
+          it->Parent_Node->Right_Node=nullptr;
+        }
+
+        //Next, we need to transfer the to_be_deleted pointers to "it"
+        // Since "it" is going to replace it.
+        it->Left_Node=to_be_deleted->Left_Node;
+        it->Right_Node=to_be_deleted->Right_Node;
+        it->Parent_Node=to_be_deleted->Parent_Node;
+
+        //Next, we need to make sure the parent points to the new "it"
+        if(to_be_deleted->Parent_Node!=nullptr)
+        {
+          if(to_be_deleted->Parent_Node->Right_Node==to_be_deleted)
+          {
+            it->Parent_Node->Right_Node=it;
+          }
+          else
+          {
+            it->Parent_Node->Left_Node=it;
+          }
+        }
+        else
+        {
+          //this is the situation when we are deleting the root node
+          this->Root_Node=it;
+        }
+
+        //Before we fully delete, we need to make sure that the left and right nodes of to_be_deleted actually point
+        // to "it"
+        if(to_be_deleted->Left_Node!=nullptr)
+        {
+          to_be_deleted->Left_Node->Parent_Node=it;
+        }
+        if(to_be_deleted->Right_Node!=nullptr)
+        {
+          to_be_deleted->Right_Node->Parent_Node=it;
+        }
+
+        //Next, disconnect to_be_deleted from the tree and delete it
+        to_be_deleted->Right_Node=nullptr;
+        to_be_deleted->Left_Node=nullptr;
+        to_be_deleted->Parent_Node=nullptr;
+        delete to_be_deleted;
+      }
+      else
+      {
+        //this is the situation when we it did not even move away from to_be_deleted->Left_Node
+        it->Parent_Node=to_be_deleted->Parent_Node;
+        it->Right_Node=to_be_deleted->Right_Node;   //the right node of to_be_deleted->Left_Node=nullptr
+
+        if(it->Right_Node!=nullptr)
+        {
+          it->Right_Node->Parent_Node=it;
+        }
+
+        //Connect the parents right/left node to "it"
+        if(it->Parent_Node!=nullptr)
+        {
+          if(it->Parent_Node->Right_Node==to_be_deleted)
+          {
+            it->Parent_Node->Right_Node=it;
+          }
+          else
+          {
+            it->Parent_Node->Left_Node=it;
+          }
+        }
+        else
+        {
+          this->Root_Node=it;
+        }
+
+
+        to_be_deleted->Right_Node=nullptr;
+        to_be_deleted->Left_Node=nullptr;
+        to_be_deleted->Parent_Node=nullptr;
+        delete to_be_deleted;
+
+
+      }
+    }
+    else
+    {
+      //this is the situation we are deleting a node with no left or right nodes
+      //this is special since we can just delete it out right,
+      //unless it is the root node, which then requires us to make sure the root node becomes null.
+
+      if(to_be_deleted->Parent_Node!=nullptr)
+      {
+        //make sure the parent node does not point to to_be_deleted anymore
         if(to_be_deleted->Parent_Node->Right_Node==to_be_deleted)
         {
+          //disconnect it from the tree
           to_be_deleted->Parent_Node->Right_Node=nullptr;
+          delete to_be_deleted;
         }
         else
         {
           to_be_deleted->Parent_Node->Left_Node=nullptr;
+          delete to_be_deleted;
         }
       }
-      to_be_deleted->Left_Node=nullptr;
-      to_be_deleted->Right_Node=nullptr;
-      delete to_be_deleted;                           //delete the node and do nothing
-
-      return;
-    }
-    else
-    {
-      if(to_be_deleted->Parent_Node->Left_Node == to_be_deleted)               //we need to check which side of the parent node to_be_deleted is on
-      {
-        to_be_deleted->Parent_Node->Left_Node=to_be_deleted->Left_Node;        //If its the left node, then replace that pointer with the to_be_deleted pointer to its children on the left side
-
-        to_be_deleted->Left_Node=nullptr;     //Make sure we don't delete everything under it
-        to_be_deleted->Right_Node=nullptr;    //Since the destructor will delete them recursivly
-        delete to_be_deleted;
-
-        return;
-      }
       else
       {
-        to_be_deleted->Parent_Node->Right_Node=to_be_deleted->Left_Node;       //Same thing, but on the right node pointer for its parent
-
-        to_be_deleted->Left_Node=nullptr;      //Make sure we don't delete everything under it
-        to_be_deleted->Right_Node=nullptr;    //Since the destructor will delete them recursivly
+        //this is the situation we are deleting the root node and its the last node
+        this->Root_Node=nullptr;
         delete to_be_deleted;
-
-        return;
       }
     }
   }
-  else
-  {
-    //when there is children in the right node, we need to search for the smallest node, which means we need to travel through the left turns beginning at the first right node child of to_be_deleted
-    BST_Node<T,S>* iterator = to_be_deleted->Right_Node;
-    //walk through the left nodes till we stop
-    //There is a case where there is no left turns, which we handle below
-    while(iterator->Left_Node != nullptr)
-    {
-      iterator= iterator->Left_Node;
-    }
-
-    //If the right node is null, then just replace the deleted spot by this most left node
-    if(iterator->Right_Node==nullptr && iterator!=to_be_deleted->Right_Node)
-    {
-      //transfer the data over
-      to_be_deleted->data = iterator->data;
-      to_be_deleted->pivot=iterator->pivot;
-      //Now delete an pointers to the spot where the iterator is
-      iterator->Parent_Node->Left_Node=iterator->Right_Node;
-
-      iterator->Left_Node=nullptr;            //Make sure we do not delete everything under the node that this points to
-      iterator->Right_Node=nullptr;           //since the destructor is recursive
-      delete iterator;
-
-    }
-    else      //This is the case, where the iterator did not even move (which means the right node of the to be deleted does not have a left node)
-    {
-      //replace the to be deleted by its right node
 
 
-      iterator->Left_Node=iterator->Parent_Node->Left_Node;   //Make sure we dont lose all the nodes on the left
-
-      iterator->Parent_Node=iterator->Parent_Node->Parent_Node; //connect this node to the parent of the to_be_deleted
-
-      //Make sure that the parent node points to the right node of the to_be_deleted node
-      if(iterator->Parent_Node->Right_Node==to_be_deleted)
-      {
-        iterator->Parent_Node->Right_Node=to_be_deleted->Right_Node;
-      }
-      else
-      {
-        iterator->Parent_Node->Left_Node=to_be_deleted->Right_Node;
-      }
-
-      if(iterator->Parent_Node==nullptr)
-      {
-        this->Root_Node=iterator;         //this is the case when we are deleting the main root node
-      }
-
-
-      to_be_deleted->Left_Node=nullptr;      //Make sure we don't delete everything under it
-      to_be_deleted->Right_Node=nullptr;    //Since the destructor will delete them recursivly
-      delete to_be_deleted;
-
-    }
-  }
 }
 
 
@@ -532,17 +702,43 @@ BST_Node<T,S>* BST<T,S>::Search(BST_Node<T,S>* &node, S pivot,T element)
     {
       return Search(node->Right_Node,pivot,element);
     }
-    else if(node->pivot == pivot)
+    else if(node->pivot == pivot && node->data.find(element)!=node->data.end())
     {
       return node;
     }
     else
     {
-      std::cout << "No such node exists"<< std::endl;
+      std::cout << "No such node/elmemnt exists"<< std::endl;
       return nullptr;
     }
 }
 
+//-------------------------------------------------------
+//Overloaded search only for the node with certain pivot
+template<class T,class S>
+BST_Node<T,S>* BST<T,S>::Search(BST_Node<T,S>* &node, S pivot)
+{
+
+  if(node->pivot>pivot && node->Left_Node != nullptr)
+  {
+
+    return Search(node->Left_Node, pivot);
+  }
+  else if(node->pivot < pivot && node->Right_Node != nullptr)
+  {
+
+    return Search(node->Right_Node,pivot);
+  }
+  else if(node->pivot == pivot)
+  {
+    return node;
+  }
+  else
+  {
+    std::cout << "No such node exists"<< std::endl;
+    return nullptr;
+  }
+}
 
 //---------------------------------------------
 //Is Empty Function
@@ -564,6 +760,7 @@ bool BST<T,S>::Is_Empty()
 template<class T, class S>
 void BST<T,S>::Search_Compare_Point(BST_Node<T,S>* &node,S pivot, T element)
 {
+
   if(node->pivot> pivot)          //If the element is less then the data of node, then search left of the node for a spot
   {
     if(node->Left_Node==nullptr)
@@ -1055,7 +1252,6 @@ template<class T,class S>
 BSTIterator<T,S>& BSTIterator<T,S>::operator++()
 {
   //BSTIterator(cur_node->Right_Node);
-
   if(cur_node->Right_Node!=nullptr)
   {
     BST_Node<T,S>* nodes=cur_node->Right_Node;
@@ -1085,7 +1281,7 @@ BSTIterator<T,S>& BSTIterator<T,S>::operator++()
 //------------------------------------------------
 //equality relation
 template<class T,class S>
-bool BSTIterator<T,S>::operator==(const BSTIterator<T,S>& other)
+bool BSTIterator<T,S>::operator==(const BSTIterator<T,S>& other)const
 {
   return this->cur_node==other.cur_node;
 }
@@ -1093,7 +1289,7 @@ bool BSTIterator<T,S>::operator==(const BSTIterator<T,S>& other)
 //------------------------------------------------
 //not equal relation
 template<class T,class S>
-bool BSTIterator<T,S>::operator!=(const BSTIterator<T,S>& other)
+bool BSTIterator<T,S>::operator!=(const BSTIterator<T,S>& other)const
 {
   return !(*this==other);
 }
@@ -1101,10 +1297,19 @@ bool BSTIterator<T,S>::operator!=(const BSTIterator<T,S>& other)
 //-----------------------------------------------
 //Dereference operator
 template<class T,class S>
-BST_Node<T,S>& BSTIterator<T,S>::operator*()
+BST_Node<T,S>& BSTIterator<T,S>::operator*()const
 {
   return *this->cur_node;
 }
+
+//----------------------------------------------
+// arrow operator
+template<class T,class S>
+BST_Node<T,S>* BSTIterator<T,S>::operator->()const
+{
+  return &(operator*());
+}
+
 
 //----------------------------------------------
 //End of BSTIterator functions

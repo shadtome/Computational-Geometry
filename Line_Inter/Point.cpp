@@ -114,3 +114,8 @@ bool Point2::operator==(const Point2 point)const
   }
   return false;
 }
+
+bool Point2::operator!=(const Point2 point)const
+{
+  return !(*this==point);
+}
