@@ -2,6 +2,7 @@
 #define LINEINTER_MATH_H
 
 #include "Point.h"
+#include <cmath>
 
 //Takes three row vectors and out puts the determinant of
 /*  a_1 a_2 1
@@ -26,6 +27,20 @@ inline bool Collinear(Point2 &A,Point2 &B,Point2 &C)
     return 1;
   }
 }
+
+
+//Dot product
+inline float Dot(Point2 &V,Point2 &W)
+{
+  return V.x*W.x+V.y*W.y;
+}
+
+//Norm
+inline float Norm(Point2 &V)
+{
+  return std::sqrt(Dot(V,V));
+}
+
 
 
 

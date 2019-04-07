@@ -437,6 +437,7 @@ void BST<T,S>::Delete(S pivot)
   {
     if(to_be_deleted->Right_Node!=nullptr)  //Check if the right node is not null
     {
+
       //we will start searching in the left nodes of the to_be_deleted->Right_Node
       // To find the smallest node in this subtree to replace the to_be_deleted node
 
@@ -552,6 +553,7 @@ void BST<T,S>::Delete(S pivot)
     }
     else if(to_be_deleted->Left_Node!=nullptr)
     {
+
       //In this situation, we will look at the left node of to_be_deleted and search for the largest node
       // in this subtree
       auto it=to_be_deleted->Left_Node;
@@ -563,7 +565,7 @@ void BST<T,S>::Delete(S pivot)
       //Now that we have the biggest node in this subtree, we can replace the
       // to_be_deleted node with the it node and make sure we connect the correct pointers
 
-      if(it!=to_be_deleted->Right_Node)
+      if(it!=to_be_deleted->Left_Node)
       {
         //if the left node of it is not nullptr, we need to make sure to connect it with "it"'s parent
         if(it->Left_Node!=nullptr)
@@ -619,6 +621,7 @@ void BST<T,S>::Delete(S pivot)
       }
       else
       {
+
         //this is the situation when we it did not even move away from to_be_deleted->Left_Node
         it->Parent_Node=to_be_deleted->Parent_Node;
         it->Right_Node=to_be_deleted->Right_Node;   //the right node of to_be_deleted->Left_Node=nullptr
@@ -819,21 +822,20 @@ void BST<T,S>::Search_Compare_Point(BST_Node<T,S>* &node,S pivot)
     else
       Search_Compare_Point(node->Left_Node,pivot);
   }
-
-  if(node->pivot<pivot)          //If the element is greater then the data of node, then search right of the node for a spot
+  else if(node->pivot<pivot)      //If the element is greater then the data of node, then search right of the node for a spot
   {
     if(node->Right_Node==nullptr)
     {
       BST_Node<T,S>* node_p= new BST_Node<T,S>;          //Make new node pointer
       node_p->pivot=pivot;
-      node_p->Parent_Node=node;                               //Input the data for new node
+      node_p->Parent_Node=node;
       node->Right_Node=node_p;
       return;
     }
     else
       Search_Compare_Point(node->Right_Node,pivot);
   }
-  if(node->pivot==pivot)                                                   //If the pivot is the same, then add the data in the same spot
+  else                                                   //If the pivot is the same then do nothing
   {
     return;
   }
@@ -1252,15 +1254,19 @@ template<class T,class S>
 BSTIterator<T,S>& BSTIterator<T,S>::operator++()
 {
   //BSTIterator(cur_node->Right_Node);
-  if(cur_node->Right_Node!=nullptr)
+  if(cur_node!=nullptr)
   {
-    BST_Node<T,S>* nodes=cur_node->Right_Node;
-    while(nodes!=nullptr)
+    if(cur_node->Right_Node!=nullptr)
     {
-      this->stack.push(nodes);
-      nodes=nodes->Left_Node;
+      BST_Node<T,S>* nodes=cur_node->Right_Node;
+      while(nodes!=nullptr)
+      {
+        this->stack.push(nodes);
+        nodes=nodes->Left_Node;
+      }
     }
   }
+
 
   if(this->stack.empty()==false)
   {
@@ -1299,7 +1305,7 @@ bool BSTIterator<T,S>::operator!=(const BSTIterator<T,S>& other)const
 template<class T,class S>
 BST_Node<T,S>& BSTIterator<T,S>::operator*()const
 {
-  return *this->cur_node;
+  return *(this->cur_node);
 }
 
 //----------------------------------------------
@@ -1307,6 +1313,7 @@ BST_Node<T,S>& BSTIterator<T,S>::operator*()const
 template<class T,class S>
 BST_Node<T,S>* BSTIterator<T,S>::operator->()const
 {
+
   return &(operator*());
 }
 

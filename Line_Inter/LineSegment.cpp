@@ -1,5 +1,7 @@
 #include "LineSegment.h"
+#include "LineInterMath.h"
 #include <iostream>
+#include <cmath>
 
 //Source code for the class LineSegment
 
@@ -39,16 +41,48 @@ Line_Segment::Line_Segment(Point2 point_1, Point2 point_2)
 //< operator
 bool Line_Segment::operator<(const Line_Segment &line)const
 {
+  //This is when we have two line segments with the same top end point,
+  //The way we find the ordering with respect to the sweep line is through their slopes
+  // i.e.
+  /*
+              * * * * *  l_4
+      l_1   * * *
+          *   *   *     l_3
+        *     *     *
+              l_2
+    l_1<l_2<l_3<l_4, where slope(l_1)>0, slope(l_2)=undefined, slope(l_3)<0, slope(l_4)=0
+                    and where angle(l_1)=pi/4, angle(l_2)=pi/2, angle(l_3)=3pi/4, angle(l_4)=pi
+    Should I avoid using cos^{-1} and norm to do this? since the easiest way to do this is to
+    find the angle of the vector starting at the center with respect to the left (-1,0),
+    and hence the ordering is with respect to the angles (0,pi].
+    The line segment can never be pointing to the left from the center, since it will contradict the ordering of the
+    line end points.
+  */
 
-  if(this->sweep_int.first.x<line.sweep_int.first.x)
+
+  if(this->End_Points[0]==line.End_Points[0])
   {
-    return true;
+    //Vectors for *this and line.
+    Point2 vector_1(this->End_Points[1].x-this->End_Points[0].x,this->End_Points[1].y-this->End_Points[0].y);
+    Point2 vector_2(line.End_Points[1].x-line.End_Points[0].x,line.End_Points[1].y-line.End_Points[0].y);
+
+    //Next, compute the angles with respect to the vector (-1,0)
+    float angle_1=std::acos(-vector_1.x/Norm(vector_1));
+    float angle_2=std::acos(-vector_2.x/Norm(vector_2));
+
+    if(angle_1<angle_2)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
-  else if(this->sweep_int.first.x>line.sweep_int.first.x)
-  {
-    return false;
-  }
-  else
+
+  //This is the ordinary relation, when the top end point do not equal to each other
+
+  if(std::abs(this->sweep_int.first.x-line.sweep_int.first.x)<0.0001)
   {
     if(this->End_Points[(int)this->sweep_int.second].x<line.End_Points[(int)line.sweep_int.second].x)
     {
@@ -59,6 +93,12 @@ bool Line_Segment::operator<(const Line_Segment &line)const
       return false;
     }
   }
+  else if(this->sweep_int.first.x<line.sweep_int.first.x)
+  {
+    return true;
+  }
+  //otherwise
+  return false;
 }
 
 //<= operator
@@ -81,16 +121,31 @@ bool Line_Segment::operator<=(const Line_Segment &line)const
 
 bool Line_Segment::operator>(const Line_Segment &line)const
 {
+  //this is the situation where the top endpoints are the same
+  if(this->End_Points[0]==line.End_Points[0])
+  {
+    //Vectors for *this and line.
+    Point2 vector_1(this->End_Points[1].x-this->End_Points[0].x,this->End_Points[1].y-this->End_Points[0].y);
+    Point2 vector_2(line.End_Points[1].x-line.End_Points[0].x,line.End_Points[1].y-line.End_Points[0].y);
 
-  if(this->sweep_int.first.x>line.sweep_int.first.x)
-  {
-    return true;
+    //Next, compute the angles with respect to the vector (-1,0)
+    float angle_1=std::acos(-vector_1.x/Norm(vector_1));
+    float angle_2=std::acos(-vector_2.x/Norm(vector_2));
+
+    if(angle_1>angle_2)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
-  else if(this->sweep_int.first.x<line.sweep_int.first.x)
-  {
-    return false;
-  }
-  else
+
+
+  //regular situation
+
+  if(std::abs(this->sweep_int.first.x-line.sweep_int.first.x)<0.0001)
   {
     if(this->End_Points[(int)this->sweep_int.second].x>line.End_Points[(int)line.sweep_int.second].x)
     {
@@ -101,6 +156,12 @@ bool Line_Segment::operator>(const Line_Segment &line)const
       return false;
     }
   }
+  else if(this->sweep_int.first.x>line.sweep_int.first.x)
+  {
+    return true;
+  }
+  //Otherwise
+  return false;
 }
 
 //>= operator
@@ -123,7 +184,7 @@ bool Line_Segment::operator>=(const Line_Segment &line)const
 
 bool Line_Segment::operator==(const Line_Segment &line)const
 {
-  if(this->End_Points[0]==line.End_Points[0] && this->End_Points[1]==line.End_Points[1] && this->sweep_int.first.x==line.sweep_int.first.x)
+  if(this->End_Points[0]==line.End_Points[0] && this->End_Points[1]==line.End_Points[1] && std::abs(this->sweep_int.first.x-line.sweep_int.first.x)<0.0001)
   {
 
     return true;
@@ -168,11 +229,16 @@ std::pair<bool,Point2> Line_Segment::Intersection(const Line_Segment &other)cons
   y_line2_proj.push_back(other.End_Points[1].y);
   std::sort(y_line2_proj.begin(),y_line2_proj.end());
 
-  //Now check the numbers
-  float x_int=(x_line1_proj[0]-x_line2_proj[0])*(x_line1_proj[1]-x_line2_proj[1]);
-  float y_int=(y_line1_proj[0]-y_line2_proj[0])*(y_line1_proj[1]-y_line2_proj[1]);
+  //This check if the x_line_1_proj[1] is between x_line_proj[0] and x_line_proj[1]
+  float x_int_1=(x_line1_proj[1]-x_line2_proj[0])*(x_line1_proj[1]-x_line2_proj[1]);
+  //This check if the x_line_2_proj[1] is between x_line_proj[0] and x_line_proj[1]
+  float x_int_2=(x_line2_proj[1]-x_line1_proj[0])*(x_line2_proj[1]-x_line1_proj[1]);
+  //same for the y
+  float y_int_1=(y_line1_proj[1]-y_line2_proj[0])*(y_line1_proj[1]-y_line2_proj[1]);
+  float y_int_2=(y_line2_proj[1]-y_line1_proj[0])*(y_line2_proj[1]-y_line1_proj[1]);
 
-  if(x_int<=0 && y_int<=0)    //This means we do have a intersection (prove this)
+  std::cout << "testing intersection with vertical"<<"::"<<x_int_1*x_int_2<<"::"<<y_int_1*y_int_2<<std::endl;
+  if((x_int_1*x_int_2<=0) && (y_int_1*y_int_2<=0))    //This means we do have a intersection (prove this)
   {
     //Slopes of the lines
     if(this->End_Points[0].x!=this->End_Points[1].x)
@@ -197,26 +263,43 @@ std::pair<bool,Point2> Line_Segment::Intersection(const Line_Segment &other)cons
           //They can not be intersecting if they are unique
           return std::pair<bool,Point2>(false,Point2(0.0,0.0));
         }
-
-
-        std::cout << "x"<< x <<std::endl;
-        std::cout << "y" << y<<std::endl;
-        return std::pair<bool,Point2>(true,Point2(x,y));
+        //We need to make sure the points we found are on the line segment
+        //since this is only accounting for if its on the entire line
+        Point2 point(x,y);
+        std::cout << "x"<<"::"<<x<<std::endl;
+        std::cout << "y"<<"::"<<y<<std::endl;
+        return std::pair<bool,Point2>(On_Line(point)&& other.On_Line(point),point);
       }
       else
       {
         float x=other.End_Points[0].x;
         float y=m_1*(x-this->End_Points[0].x)+this->End_Points[0].y;
-
-        std::cout << "x"<<x<<std::endl;
-        std::cout << "y"<< y <<std::endl;
-        return std::pair<bool,Point2>(true,Point2(x,y));
+        Point2 point(x,y);
+        std::cout << "x"<<"::"<<x<<std::endl;
+        std::cout << "y"<<"::"<<y<<std::endl;
+        return std::pair<bool,Point2>(On_Line(point) && other.On_Line(point),point);
       }
     }
     else
     {
-      //This situation we are assuming does not exists (change later to tackle this)
-      //This is when they have a infinite number of intersection points.
+      //First, lets assume the other is not horizontal as well.
+      if(other.End_Points[0].x!=other.End_Points[1].x)
+      {
+        //slope of other line
+        float m=(other.End_Points[0].y-other.End_Points[1].y)/(other.End_Points[0].x-other.End_Points[1].x);
+        //These represent the intersection line.
+        float x;
+        float y;
+        //since "this" line is vertical, all we need to do is insert the x-coordinate into the equation of the line for other line
+        //to get the intersection point.
+        x=this->End_Points[0].x;
+        y=m*(x-other.End_Points[0].x)+other.End_Points[0].y;
+
+        Point2 point(x,y);
+        std::cout << "x"<<"::"<<x<<std::endl;
+        std::cout<<"y"<<"::"<<y<<std::endl;
+        return std::pair<bool,Point2>(On_Line(point)&&other.On_Line(point),point);
+      }
       return std::pair<bool,Point2>(false,Point2(0.0,0.0));
     }
 
@@ -231,12 +314,13 @@ std::pair<bool,Point2> Line_Segment::Intersection(const Line_Segment &other)cons
 
 //--------------------------------------------------------------
 //Checks if point is on line function
-bool Line_Segment::On_Line(Point2 &p)
+bool Line_Segment::On_Line(const Point2 &p)const
 {
   if(this->End_Points[0].x!=this->End_Points[1].x)
   {
+    std::cout << "1 way"<<std::endl;
     float m=(this->End_Points[0].y-this->End_Points[1].y)/(this->End_Points[0].x-this->End_Points[1].x);
-    if(m*(p.x-this->End_Points[0].x)+this->End_Points[0].y==p.y)
+    if(std::abs(m*(p.x-this->End_Points[0].x)+this->End_Points[0].y-p.y)<0.0001)
     {
       //Next, we need to make sure it is between the perpindular lines at the end points
       if(m!=0)
@@ -270,7 +354,8 @@ bool Line_Segment::On_Line(Point2 &p)
   }
   else
   {
-    if(this->End_Points[0].y>=p.y && this->End_Points[0].y<=p.y && p.x==this->End_Points[0].x)
+
+    if(this->End_Points[0].y>=p.y && this->End_Points[1].y<=p.y && std::abs(p.x-this->End_Points[0].x)<0.0001)
     {
       return true;
     }
@@ -279,4 +364,49 @@ bool Line_Segment::On_Line(Point2 &p)
       return false;
     }
   }
+}
+
+
+
+//Update sweep line function
+void Line_Segment::Update_sweep(const Point2 &sweep)
+{
+  if(this->End_Points[0].x!=this->End_Points[1].x)
+  {
+    float m=(this->End_Points[0].y-this->End_Points[1].y)/(this->End_Points[0].x-this->End_Points[1].x);
+    if(m!=0)
+    {
+      this->sweep_int.first.x=(sweep.y-this->End_Points[0].y)/m+this->End_Points[0].x;
+      this->sweep_int.first.y=sweep.y;
+    }
+    //Otherwise, no need to update as the line is horizontal
+  }
+  //Otherwise, no need to update the sweep_int, as the x part is always the same.
+}
+
+//--------------------------
+
+//--------------------------
+//Find the x value
+
+float Line_Segment::Find_x(const float &y) const
+{
+  if(this->End_Points[0].x!=this->End_Points[1].x)
+  {
+    float m=(this->End_Points[0].y-this->End_Points[1].y)/(this->End_Points[0].x-this->End_Points[1].x);
+    if(m!=0)
+    {
+      return (y-this->End_Points[0].y)/m+this->End_Points[0].x;
+    }
+    else
+    {
+      //this means they are on the same line and we will ignore this for now, as this means they
+      //a infinite number of points on their intersection.
+    }
+  }
+  else
+  {
+    return this->End_Points[0].x;
+  }
+  return 0;
 }
