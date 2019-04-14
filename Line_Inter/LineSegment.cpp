@@ -237,7 +237,7 @@ std::pair<bool,Point2> Line_Segment::Intersection(const Line_Segment &other)cons
   float y_int_1=(y_line1_proj[1]-y_line2_proj[0])*(y_line1_proj[1]-y_line2_proj[1]);
   float y_int_2=(y_line2_proj[1]-y_line1_proj[0])*(y_line2_proj[1]-y_line1_proj[1]);
 
-  std::cout << "testing intersection with vertical"<<"::"<<x_int_1*x_int_2<<"::"<<y_int_1*y_int_2<<std::endl;
+
   if((x_int_1*x_int_2<=0) && (y_int_1*y_int_2<=0))    //This means we do have a intersection (prove this)
   {
     //Slopes of the lines
@@ -266,8 +266,7 @@ std::pair<bool,Point2> Line_Segment::Intersection(const Line_Segment &other)cons
         //We need to make sure the points we found are on the line segment
         //since this is only accounting for if its on the entire line
         Point2 point(x,y);
-        std::cout << "x"<<"::"<<x<<std::endl;
-        std::cout << "y"<<"::"<<y<<std::endl;
+
         return std::pair<bool,Point2>(On_Line(point)&& other.On_Line(point),point);
       }
       else
@@ -275,8 +274,7 @@ std::pair<bool,Point2> Line_Segment::Intersection(const Line_Segment &other)cons
         float x=other.End_Points[0].x;
         float y=m_1*(x-this->End_Points[0].x)+this->End_Points[0].y;
         Point2 point(x,y);
-        std::cout << "x"<<"::"<<x<<std::endl;
-        std::cout << "y"<<"::"<<y<<std::endl;
+
         return std::pair<bool,Point2>(On_Line(point) && other.On_Line(point),point);
       }
     }
@@ -296,8 +294,7 @@ std::pair<bool,Point2> Line_Segment::Intersection(const Line_Segment &other)cons
         y=m*(x-other.End_Points[0].x)+other.End_Points[0].y;
 
         Point2 point(x,y);
-        std::cout << "x"<<"::"<<x<<std::endl;
-        std::cout<<"y"<<"::"<<y<<std::endl;
+
         return std::pair<bool,Point2>(On_Line(point)&&other.On_Line(point),point);
       }
       return std::pair<bool,Point2>(false,Point2(0.0,0.0));
@@ -318,7 +315,6 @@ bool Line_Segment::On_Line(const Point2 &p)const
 {
   if(this->End_Points[0].x!=this->End_Points[1].x)
   {
-    std::cout << "1 way"<<std::endl;
     float m=(this->End_Points[0].y-this->End_Points[1].y)/(this->End_Points[0].x-this->End_Points[1].x);
     if(std::abs(m*(p.x-this->End_Points[0].x)+this->End_Points[0].y-p.y)<0.0001)
     {
@@ -369,7 +365,7 @@ bool Line_Segment::On_Line(const Point2 &p)const
 
 
 //Update sweep line function
-void Line_Segment::Update_sweep(const Point2 &sweep)
+void Line_Segment::Update_sweep(const Point2 &sweep, Which_Side side)
 {
   if(this->End_Points[0].x!=this->End_Points[1].x)
   {
@@ -382,6 +378,9 @@ void Line_Segment::Update_sweep(const Point2 &sweep)
     //Otherwise, no need to update as the line is horizontal
   }
   //Otherwise, no need to update the sweep_int, as the x part is always the same.
+
+  //Now update if it is UPPER or LOWER
+  this->sweep_int.second=side;
 }
 
 //--------------------------

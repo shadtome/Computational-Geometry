@@ -66,7 +66,7 @@ public:
   * This just takes the sweep line and plugs the y-component in to the line equation
   * to obtain the x-coordinate.
   */
-  void Update_sweep(const Point2 &sweep);
+  void Update_sweep(const Point2 &sweep, Which_Side side);
 
   /*
   * Find the x on this line corresponding to the y-value.

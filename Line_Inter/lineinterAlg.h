@@ -41,6 +41,7 @@ struct Intersection_Point
 * This algorthim uses two balanced binary search trees for the event queue and status.
 * This algorthim finds the line intersections by following a line sweep downward and check for intersection
 * everytime a event queue is processed.
+* Furthermore, this does not account for infinite number of intersections.
 */
 std::map<Point2,Intersection_Point> Find_Intersection(std::vector<Line_Segment> lines);
 

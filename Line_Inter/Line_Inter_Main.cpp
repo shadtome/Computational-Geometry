@@ -9,10 +9,13 @@
 int main()
 {
   std::vector<Line_Segment> lines;
-  lines.push_back(Line_Segment({1.23,10.1},{-1.30,7.0}));
-  lines.push_back(Line_Segment({4.21,-3.5},{5.6,-14.0}));
-  lines.push_back(Line_Segment({10.4,2.5},{1.3,3.5}));
-  lines.push_back(Line_Segment({-5.4,2.1},{6.702,30.41}));
+  lines.push_back(Line_Segment({1.0,1.0},{0.0,0.0}));
+  lines.push_back(Line_Segment({1.0,0.0},{0.0,1.0}));
+  lines.push_back(Line_Segment({0.0,0.5},{1.0,1.0}));
+  lines.push_back(Line_Segment({0.5,0.0},{0.0,0.5}));
+  lines.push_back(Line_Segment({0.1,0.7},{2.0,1.34}));
+  lines.push_back(Line_Segment({0.762,1.3},{0.762,0.4}));
+  lines.push_back(Line_Segment({-0.3,0.4523},{2.3,0.4523}));
 
 
 

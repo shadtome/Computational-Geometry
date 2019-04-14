@@ -38,17 +38,8 @@ std::map<Point2,Intersection_Point> Find_Intersection(std::vector<Line_Segment> 
 
   for(unsigned int k=0; k<lines.size(); ++k)
   {
-    Q.Insert(lines[k].End_Points[0],lines[k]);  //Insert the pivot point as the upper left most point, and the connected line segment
-    Q.Insert(lines[k].End_Points[1]);           //Just insert the pivot point, with no data added to it
-  }
-
-  for(auto k=Q.begin(); k!=Q.end(); ++k)
-  {
-    std::cout << k->pivot.x << "::"<<k->pivot.y<<std::endl;
-    for(auto j=k->data.begin(); j!=k->data.end(); ++j)
-    {
-      std::cout << j->first.End_Points[0].x<<"::"<<j->first.End_Points[0].y<<" "<<j->first.End_Points[1].x<<"::"<<j->first.End_Points[1].y<<std::endl;
-    }
+    Q.Balanced_Insert(lines[k].End_Points[0],lines[k]);  //Insert the pivot point as the upper left most point, and the connected line segment
+    Q.Balanced_Insert(lines[k].End_Points[1]);           //Just insert the pivot point, with no data added to it
   }
 
   while(Q.Is_Empty()==false)
@@ -60,40 +51,11 @@ std::map<Point2,Intersection_Point> Find_Intersection(std::vector<Line_Segment> 
     //Event point, which is the first elemnt of this list
     Queue_Node* event_point=ordered_events[0];
 
-    std::cout << "EVENT POINT"<<event_point->pivot.x<<"::"<<event_point->pivot.y<<std::endl;
     //Next, process this event point
     //This is the meat of the algo
-    std::cout<<"HELLO"<<std::endl;
     HandleEventPoint(event_point,Q,T,result);
-    std::cout << "BYE"<<std::endl;
 
-    std::cout << event_point->pivot.x <<"::"<<event_point->pivot.y<<std::endl;
-
-    for(auto k=Q.begin(); k!=Q.end(); ++k)
-    {
-      std::cout << k->pivot.x << "::"<<k->pivot.y<<std::endl;
-    }
-
-
-    std::cout << event_point->pivot.x<<"::"<<event_point->pivot.y<<std::endl;
-    Q.Delete(event_point->pivot);
-
-    /*//Insert the line_segments in to the result map, if there
-    // are any intersections
-    if(int_lines.size()>0)
-    {
-      for(unsigned int k=0; k<int_lines.size(); ++k)
-      {
-        Intersection_Point intersections(event_point->pivot,int_lines);
-        result[event_point->pivot]=intersections;
-      }
-    }*/
-
-    /*for(auto k=Q.begin(); k!=Q.end(); ++k)
-    {
-      //std::cout << "STACK"<< k.stack.size()<<std::endl;
-      std::cout << k->pivot.x << "::"<<k->pivot.y<<std::endl;
-    }*/
+    Q.Balanced_Delete(event_point->pivot);
 
   }
 
@@ -127,11 +89,6 @@ void HandleEventPoint(Queue_Node* p,Queue &Q, Status &T,std::map<Point2,Intersec
   std::vector<Line_Segment> C_p;
 
 
-
-  for(auto k=T.begin(); k!=T.end(); ++k)
-  {
-    std::cout <<"T IN BEG" <<k->pivot.End_Points[0].x << "::"<<k->pivot.End_Points[0].y<<" "<<k->pivot.End_Points[1].x << "::"<<k->pivot.End_Points[1].y<<std::endl;
-  }
   //THis is the list of nodes in T that don't intersect p, and we need to update their
   // sweep_int to make the ordering correct.
   std::vector<Line_Segment> Does_not_int_p;
@@ -143,8 +100,6 @@ void HandleEventPoint(Queue_Node* p,Queue &Q, Status &T,std::map<Point2,Intersec
     Line_Segment nodedata=key->pivot;  //This first element of the map
     bool on_line=nodedata.On_Line(p->pivot);
 
-    std::cout<<"CURRENT LINE"<<nodedata.End_Points[0].x<<"::"<<nodedata.End_Points[0].y<<"::"<<nodedata.End_Points[1].x<<"::"<<nodedata.End_Points[1].y<<std::endl;
-    std::cout<<"DOES THIS POINT INTERSECT"<<"::"<<on_line<<std::endl;
 
     //Check if any elements of T have p as a lower endpoint or in the interior.
     if(on_line)
@@ -172,44 +127,17 @@ void HandleEventPoint(Queue_Node* p,Queue &Q, Status &T,std::map<Point2,Intersec
     //Now delete all the elements in Dont_Int_p change their sweep_int and reinsert them
   for(unsigned int k=0; k<Does_not_int_p.size(); ++k)
   {
-    T.Delete(Does_not_int_p[k]);
-    Does_not_int_p[k].Update_sweep(p->pivot);
-    T.Insert(Does_not_int_p[k]);
+    T.Balanced_Delete(Does_not_int_p[k]);
+    Does_not_int_p[k].Update_sweep(p->pivot,UPPER);
+    T.Balanced_Insert(Does_not_int_p[k]);
   }
 
-  std::cout << "AFTER RE-Inserting the elements that dont interset p"<<std::endl;
-  for(auto k=T.begin(); k!=T.end(); ++k)
-  {
-    std::cout<<k->pivot.End_Points[0].x << "::"<<k->pivot.End_Points[0].y<<" "<<k->pivot.End_Points[1].x << "::"<<k->pivot.End_Points[1].y<<std::endl;
-  }
-
-  for(unsigned int k=0; k<Does_not_int_p.size();++k)
-  {
-    if(k==2)
-    {
-      std::cout << Does_not_int_p[k].operator==(Does_not_int_p[1])<<std::endl;
-    }
-    std::cout << "DOES NOT INTER P"<< Does_not_int_p[k].End_Points[0].x<<"::"<<Does_not_int_p[k].End_Points[0].y<<"::"<<Does_not_int_p[k].End_Points[1].x<<"::"<<Does_not_int_p[k].End_Points[1].y<<std::endl;
-  }
-  for(unsigned int k=0; k<U_p.size(); ++k)
-  {
-    std::cout <<"U_P"<<U_p[k].End_Points[0].x<<"::"<<U_p[k].End_Points[0].y<<" "<<U_p[k].End_Points[1].x<<"::"<<U_p[k].End_Points[1].y<<std::endl;
-  }
-  for(unsigned int k=0; k<L_p.size(); ++k)
-  {
-    std::cout <<"L_P"<<L_p[k].End_Points[0].x<<"::"<<L_p[k].End_Points[0].y<<" "<<L_p[k].End_Points[1].x<<"::"<<L_p[k].End_Points[1].y<<std::endl;
-  }
-  for(unsigned int k=0; k<C_p.size(); ++k)
-  {
-    std::cout <<"C_P"<<C_p[k].End_Points[0].x<<"::"<<C_p[k].End_Points[0].y<<" "<<C_p[k].End_Points[1].x<<"::"<<C_p[k].End_Points[1].y<<std::endl;
-  }
 
   //Next, we need to check if U_p\cup L_p\cup C_p contain more then one line segment
   //Since L_p, C_p, and U_p are disjoint by definition, it suffices to see what the total size of these
   //sets are by adding the sizes.
   if(L_p.size()+C_p.size()+U_p.size()>1)
   {
-    std::cout << "INTERSECTION"<<"::"<< p->pivot.x<<"::"<<p->pivot.y<<std::endl;
     //This means that there is a intersection point.
     auto it=result.begin();
     if(L_p.size()>0)
@@ -238,53 +166,27 @@ void HandleEventPoint(Queue_Node* p,Queue &Q, Status &T,std::map<Point2,Intersec
   // and change the C_p ordering from upper to lower, this is to handle the switching across the sweep line
   for(unsigned int k=0; k<L_p.size(); ++k)
   {
-    T.Delete(L_p[k]);
+    T.Balanced_Delete(L_p[k]);
   }
   for(unsigned int k=0; k<C_p.size(); ++k)
   {
-    T.Delete(C_p[k]);
+    T.Balanced_Delete(C_p[k]);
   }
-
-  for(auto k=T.begin(); k!=T.end(); ++k)
-  {
-    std::cout <<"DELETED C_p,L_p" <<k->pivot.End_Points[0].x << "::"<<k->pivot.End_Points[0].y<<" "<<k->pivot.End_Points[1].x << "::"<<k->pivot.End_Points[1].y<<std::endl;
-  }
-
-
-
-
-
-
-
-
 
   // Then insert U_p and C_p in to T,
   for(unsigned int k=0; k<U_p.size(); ++k)
   {
-    T.Insert(U_p[k]);
+    T.Balanced_Insert(U_p[k]);
   }
   for(unsigned int k=0; k<C_p.size(); ++k)
   {
     //Before we put it in, we need to make sure we define a new sweep_int point, so we can distinguish it from
     // other lines that might have the same x-coordinate for its upper point that are in U_p.
-    C_p[k].Update_sweep(p->pivot);
-    C_p[k].sweep_int.second=LOWER;
-    T.Insert(C_p[k]);
-  }
-
-  for(auto k=T.begin(); k!=T.end(); ++k)
-  {
-    for(auto j=k->data.begin(); j!=k->data.end();++j)
-    {
-      std::cout <<"Inserted U_p,C_p BUT IN DATA" <<j->second.End_Points[0].x << "::"<<j->second.End_Points[0].y<<" "<<j->second.End_Points[1].x << "::"<<j->second.End_Points[1].y<<std::endl;
-    }
-    std::cout <<"Inserted U_p,C_p" <<k->pivot.End_Points[0].x << "::"<<k->pivot.End_Points[0].y<<" "<<k->pivot.End_Points[1].x << "::"<<k->pivot.End_Points[1].y<<std::endl;
-    std::cout << "pviot value"<<"::"<<k->pivot.sweep_int.first.x<<std::endl;
+    C_p[k].Update_sweep(p->pivot,LOWER);
+    T.Balanced_Insert(C_p[k]);
   }
 
 
-
-  std::cout << "BOBA"<<std::endl;
   //Next, we need to find new event points for our Queue
   // i.e. check for new intersections with our new ordering of line_segments
   // on the sweep line
@@ -333,12 +235,8 @@ void HandleEventPoint(Queue_Node* p,Queue &Q, Status &T,std::map<Point2,Intersec
         if(it!=T.end())
         {
           S_r=it->pivot;      //This is the right line segment of P
-
-
-
-          std::cout <<"S_L EMPTY" << S_l.End_Points[0].x<<"::"<<S_l.End_Points[0].y<<" "<<S_l.End_Points[1].x<<"::"<<S_l.End_Points[1].y<<std::endl;
-          std::cout <<"S_R EMPTY" << S_r.End_Points[0].x<<"::"<<S_r.End_Points[0].y<<" "<<S_r.End_Points[1].x<<"::"<<S_r.End_Points[1].y<<std::endl;
-          Find_New_Event(S_l,S_r,p->pivot,Q,intersections); //Find new intersection points between these new neighbors
+          //Find new intersection points between these new neighbors
+          Find_New_Event(S_l,S_r,p->pivot,Q,intersections);
         }
       }
 
@@ -366,8 +264,7 @@ void HandleEventPoint(Queue_Node* p,Queue &Q, Status &T,std::map<Point2,Intersec
     std::sort(C_U.begin(),C_U.end());           //We need to sort the elements to find the first and last.
     l_p=C_U.front();
     r_p=C_U.back();
-    std::cout << "C_U front"<<"::"<<l_p.End_Points[0].x<<"::"<<l_p.End_Points[0].y<<"::"<<l_p.End_Points[1].x<<"::"<<l_p.End_Points[1].y<<std::endl;
-    std::cout << "C_U back"<<"::"<<r_p.End_Points[0].x<<"::"<<r_p.End_Points[0].y<<"::"<<r_p.End_Points[1].x<<"::"<<r_p.End_Points[1].y<<std::endl;
+
 
     //Next, we need to find the S_l, and S_r, (in the same way we did C_p\cup U_p=empty case, with out the point p)
     auto it=T.begin();
@@ -396,8 +293,7 @@ void HandleEventPoint(Queue_Node* p,Queue &Q, Status &T,std::map<Point2,Intersec
       {
         S_l=it_2->pivot;
         Find_New_Event(S_l,l_p,p->pivot,Q,intersections);
-        std::cout <<"S_L NOTEMPTY" << S_l.End_Points[0].x<<"::"<<S_l.End_Points[0].y<<" "<<S_l.End_Points[1].x<<"::"<<S_l.End_Points[1].y<<std::endl;
-        std::cout <<"l_p NOTEMPTY" << l_p.End_Points[0].x<<"::"<<l_p.End_Points[0].y<<" "<<l_p.End_Points[1].x<<"::"<<l_p.End_Points[1].y<<std::endl;
+
       }
 
 
@@ -415,52 +311,12 @@ void HandleEventPoint(Queue_Node* p,Queue &Q, Status &T,std::map<Point2,Intersec
           S_r=key->pivot;
           Find_New_Event(r_p,S_r,p->pivot,Q,intersections);
 
-          std::cout <<"r_p NOTEMPTY" << r_p.End_Points[0].x<<"::"<<r_p.End_Points[0].y<<" "<<r_p.End_Points[1].x<<"::"<<r_p.End_Points[1].y<<std::endl;
-          std::cout <<"S_R NOTEMPTY" << S_r.End_Points[0].x<<"::"<<S_r.End_Points[0].y<<" "<<S_r.End_Points[1].x<<"::"<<S_r.End_Points[1].y<<std::endl;
         }
         break;
       }
     }
 
-    /*
-    //this is the situation we have elements that intersect p.
-    //So we need to check intersections of the neighboring of the elements in C_p and U_p.
-    //FIrst, lets put together the elements C_p and U_p together.
-    std::vector<Line_Segment> C_U;
 
-    C_U.insert(C_U.begin(),C_p.begin(),C_p.end());
-    C_U.insert(C_U.end(),U_p.begin(),U_p.end());
-
-    //Next, lets go through these and find their neighbors in T and check for intersections.
-    for(auto k=C_U.begin(); k!= C_U.end(); ++k)
-    {
-      Line_Segment R_N;   //Right neighbor
-      Line_Segment L_N;   // Left neighbor
-
-      //First, lets find the Left neighbor, which will give us a way to find the right neighbor.
-      auto it=T.begin();
-      auto it_2=it;
-
-      if(it!=T.end())
-      {
-        while(it->pivot!=l_p) //it->pivot!=l_p
-        {
-
-          it_2=it++;
-
-          if(it!=T.end())
-          {
-            break;
-          }
-
-        }
-      }
-
-      //This gives us
-      L_N=it_2->pivot;
-      R_N=(++it)->pivot;
-    }
-    */
 
   }
 
@@ -489,7 +345,7 @@ void HandleEventPoint(Queue_Node* p,Queue &Q, Status &T,std::map<Point2,Intersec
           //New Event point!
           float x=it->pivot.Find_x(k->End_Points[0].y);
           Point2 new_point(x,k->End_Points[0].y);
-          Q.Insert(new_point);
+          Q.Balanced_Insert(new_point);
         }
         ++it;
       }
@@ -513,7 +369,6 @@ void Find_New_Event(Line_Segment &l_1,Line_Segment &l_2, Point2 &point,Queue &Q,
   if(l_1.End_Points[0]!=l_2.End_Points[0] && l_1.End_Points[1]!=l_2.End_Points[1])//l_1!=l_2
   {
     inter_point=l_1.Intersection(l_2);
-    std::cout<<"test intersection"<<std::endl;
   }
   else
   {
@@ -532,7 +387,7 @@ void Find_New_Event(Line_Segment &l_1,Line_Segment &l_2, Point2 &point,Queue &Q,
     }
     else
     {
-      Q.Insert(inter_point.second);
+      Q.Balanced_Insert(inter_point.second);
     }
 
   }
