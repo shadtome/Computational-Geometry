@@ -7,13 +7,17 @@
 
 
 
-
-
-
-std::map<Point2,Intersection_Point> Find_Intersection(std::vector<Line_Segment> lines)
+//Constructor
+LineIntersections::LineIntersections(std::vector<Line_Segment> lines)
 {
-  //Initilize the map that will contain the points and the line_segments
-  std::map<Point2,Intersection_Point> result;
+  Find_Intersection(lines);
+}
+
+
+//Main Algorithm!
+
+void LineIntersections::Find_Intersection(std::vector<Line_Segment> lines)
+{
 
   /* First, define the event queue
   * This holds the points in order as the pivot points
@@ -53,14 +57,11 @@ std::map<Point2,Intersection_Point> Find_Intersection(std::vector<Line_Segment> 
 
     //Next, process this event point
     //This is the meat of the algo
-    HandleEventPoint(event_point,Q,T,result);
+    HandleEventPoint(event_point,Q,T);
 
     Q.Balanced_Delete(event_point->pivot);
 
   }
-
-  //Now we are done, so we can return the result
-  return result;
 
 }
 
@@ -70,7 +71,7 @@ std::map<Point2,Intersection_Point> Find_Intersection(std::vector<Line_Segment> 
 
 //-----------------------------------------------------
 //Handle event point function
-void HandleEventPoint(Queue_Node* p,Queue &Q, Status &T,std::map<Point2,Intersection_Point> &intersections)
+void LineIntersections::HandleEventPoint(Queue_Node* p,Queue &Q, Status &T)
 {
   //Collection of line_segments that intersect p.
   std::vector<Line_Segment> result;
@@ -157,7 +158,7 @@ void HandleEventPoint(Queue_Node* p,Queue &Q, Status &T,std::map<Point2,Intersec
     }
     //Now put in the line_segment and the point into the intersection map
     Intersection_Point collection_p_inter(p->pivot,result);
-    intersections[p->pivot]=collection_p_inter;
+    this->intersections[p->pivot]=collection_p_inter;
   }
 
 
@@ -236,7 +237,7 @@ void HandleEventPoint(Queue_Node* p,Queue &Q, Status &T,std::map<Point2,Intersec
         {
           S_r=it->pivot;      //This is the right line segment of P
           //Find new intersection points between these new neighbors
-          Find_New_Event(S_l,S_r,p->pivot,Q,intersections);
+          Find_New_Event(S_l,S_r,p->pivot,Q);
         }
       }
 
@@ -292,7 +293,7 @@ void HandleEventPoint(Queue_Node* p,Queue &Q, Status &T,std::map<Point2,Intersec
       if(it_2!=T.end())
       {
         S_l=it_2->pivot;
-        Find_New_Event(S_l,l_p,p->pivot,Q,intersections);
+        Find_New_Event(S_l,l_p,p->pivot,Q);
 
       }
 
@@ -309,7 +310,7 @@ void HandleEventPoint(Queue_Node* p,Queue &Q, Status &T,std::map<Point2,Intersec
         if(key!=T.end())
         {
           S_r=key->pivot;
-          Find_New_Event(r_p,S_r,p->pivot,Q,intersections);
+          Find_New_Event(r_p,S_r,p->pivot,Q);
 
         }
         break;
@@ -361,7 +362,7 @@ void HandleEventPoint(Queue_Node* p,Queue &Q, Status &T,std::map<Point2,Intersec
 //Find New Event point function
 
 
-void Find_New_Event(Line_Segment &l_1,Line_Segment &l_2, Point2 &point,Queue &Q,std::map<Point2,Intersection_Point> &intersections)
+void LineIntersections::Find_New_Event(Line_Segment &l_1,Line_Segment &l_2, Point2 &point,Queue &Q)
 {
   //FInd if there are any intersection points between these two lines
   std::pair<bool,Point2> inter_point;
@@ -379,8 +380,8 @@ void Find_New_Event(Line_Segment &l_1,Line_Segment &l_2, Point2 &point,Queue &Q,
   if(inter_point.first)
   {
     //If one exists, we need to make sure we did not account for this intersection already
-    auto check_point=intersections.find(inter_point.second);
-    if(check_point!=intersections.end())
+    auto check_point=this->intersections.find(inter_point.second);
+    if(check_point!=this->intersections.end())
     {
       return;     //This means that the intersection point already exists in our collection of intersection points
                   // we don't want to check the same point agian.

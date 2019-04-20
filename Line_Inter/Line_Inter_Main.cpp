@@ -20,13 +20,11 @@ int main()
 
 
 
+  LineIntersections test(lines);
 
-
-  std::map<Point2,Intersection_Point> inter=Find_Intersection(lines);
-  std::cout << inter.size()<<std::endl;
-  for(auto k=inter.begin(); k!=inter.end(); ++k)
+  for(auto k=test.begin(); k!=test.end(); ++k)
   {
-    std::cout << k->first.x << "::"<<k->first.y<<std::endl;
+    std::cout << k->first.x<<k->first.y<<std::endl;
   }
 
 
