@@ -4,7 +4,7 @@
 #include <map>
 #include <vector>
 #include "LineSegment.h"
-#include "BST.h"
+#include <BST/BST.h>
 
 
 //typedef

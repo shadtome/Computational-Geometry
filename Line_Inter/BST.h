@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <stack>
 #include <memory> //Maybe use smart pointers, but a little bit of overhead
-#include "LineSegment.h"
+
 
 
 
